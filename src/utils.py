@@ -18,6 +18,7 @@ HANDLE_ERROR   = 11
 HANDLE_INFO    = 12
 HANDLE_REMOVE  = 13
 HANDLE_HISTORY = 14
+HANDLE_HIDE    = 15
 
 def MESSAGE_KILL(user_id):
     return [HANDLE_KILL, user_id]
@@ -51,6 +52,12 @@ def MESSAGE_REMOVE(user_id):
 
 def MESSAGE_HISTORY(user_id, codelet_id, data, order_id):
     return [HANDLE_HISTORY, user_id, codelet_id, data, order_id]
+
+def MESSAGE_UNDO(user_id, codelet_id):
+    return [HANDLE_UNDO, user_id, codelet_id]
+
+def MESSAGE_HIDE(user_id, codelet_id):
+    return [HANDLE_HIDE, user_id, codelet_id]
 
 # Class and functions for creating and sending messages to the server/clients
 
@@ -100,27 +107,47 @@ def send_to_socket(sock, data):
 
 # Codelet colour information
 
+def rgb2hex(*rgb): 
+    r = int(max(0, min(rgb[0], 255)))
+    g = int(max(0, min(rgb[1], 255)))
+    b = int(max(0, min(rgb[2], 255)))
+    return "#{0:02x}{1:02x}{2:02x}".format(r, g, b)
+
+def hex2rgb(value):
+    value = value.lstrip('#')
+    return tuple(int(value[i:i+2], 16) for i in range(0,6,2) )
+
+def avg_colour(col1, col2, weight=0.5):
+    rgb1 = hex2rgb(col1)
+    rgb2 = hex2rgb(col2)
+    avg_rgb = tuple(rgb1[i] * (1-weight) + rgb2[i] * weight for i in range(3))
+    return rgb2hex(*avg_rgb)
+
 USER_COLOURS = [ 
     "#66D9EF", 
     "#ff8000", 
-    "Gold", 
+    "1e90ff",
     "#A6E22E", 
-    "Deep Pink",
-    "Yellow", 
-    "Dodger Blue",
-    "DarkOrchid1", 
-    "Orange Red", 
-    "Lime Green" 
+    "ff1493",
     ]
 
 def GET_USER_COLOUR(i):
     return USER_COLOURS[i % len(USER_COLOURS)]
 
+def GET_USER_FONT_COLOUR(i):
+    return "Black"
+
 def GET_DISABLED_COLOUR(i=None):
     return "#b3b3b3"
 
+def GET_DISABLED_FONT_COLOUR(i=None):
+    return "#565656"
+
 def GET_ERROR_COLOUR(i=None):
-    return
+    return "#ffa0be"
+
+def GET_ERROR_FONT_COLOUR(i=None):
+    return "#e1325f"
 
 # Extracting informaton from code
 
@@ -128,3 +155,7 @@ import re
 def get_players(string):
     """ Uses RegEx to return the FoxDot players in a block of text """
     return re.findall(r"(\w+)\s*>>", string)
+
+def contains_error(response):
+    """ Returns True if the response from evaluating code begins with Traceback """
+    return response.startswith("Traceback") if type(response) == str else False

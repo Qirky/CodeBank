@@ -15,9 +15,13 @@ class Workspace(Tk.Frame):
         # Buttons
 
         self.commands = CommandButtons(self, commands={
-                "PUSH"  : self.parent.push_code_to_remote,
-                "SOLO"  : self.parent.solo_local_code,
-                "RESET" : self.parent.reset_program_state,
+                "PUSH"        : self.parent.push_code_to_remote,
+                "SOLO"        : self.parent.solo_local_code,
+                "RESET"       : self.parent.reset_program_state,
+                "ROLLBACK"    : self.parent.trigger_rollback,
+                "HIDE"        : self.parent.trigger_hide_codelet,
+                "VIEW HIDDEN" : self.parent.toggle_view_hidden,
+                "CLEAR CLOCK" : self.parent.clear_clock,
             }
         )
 
@@ -78,6 +82,8 @@ class Workspace(Tk.Frame):
 
     def evaluate_code_locally(self, event=None):
         """ Runs code in the text box immediately without pushing to the remote """
+
+        self.text.highlight()
 
         code = self.text.get_text()
 

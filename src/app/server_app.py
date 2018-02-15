@@ -14,7 +14,7 @@ class ServerApp(BasicApp):
         self.handlers = {
             HANDLE_KILL    : self.handle_kill,
             HANDLE_PUSH    : self.handle_recv_codelet,
-            HANDLE_DELETE  : self.handle_delete_codelet,
+            HANDLE_HIDE    : self.handle_hide_codelet,
             HANDLE_LOAD    : self.handle_load_codelet,
             HANDLE_DISABLE : self.handle_disable_codelet,
             HANDLE_UNDO    : self.handle_rollback,
@@ -102,7 +102,7 @@ class ServerApp(BasicApp):
 
         # Evaluate the code
 
-        self.evaluate(codelet.get_text())
+        self.evaluate_codelet(codelet)
 
         # Send back to clients
 
@@ -117,8 +117,22 @@ class ServerApp(BasicApp):
         self.socket.send_to_all(MESSAGE_RELEASE(user_id, codelet_id))
         return
 
-    def handle_delete_codelet(self, user_id, data):
+    def handle_hide_codelet(self, user_id, codelet_id):
+        """ Labels the codelet as hidden and redraws the canvas, ignoring this codelet """
+        self.get_codelet(codelet_id).hide()
+        self.sharedspace.redraw()
+        self.socket.send_to_all(MESSAGE_HIDE(user_id, codelet_id))
         return
 
-    def handle_rollback(self, user_id, data):
+    def handle_rollback(self, user_id, codelet_id):
+        """ Removes the last item in the history and redraws the shared-space """
+
+        codelet = self.sharedspace.codelets[codelet_id].get_codelet()
+
+        codelet.rollback()
+
+        self.sharedspace.redraw()
+
+        self.socket.send_to_all(MESSAGE_UNDO(user_id, codelet_id))
+
         return

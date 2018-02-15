@@ -27,7 +27,7 @@ class App(BasicApp):
         self.handlers = {
             HANDLE_KILL    : self.kill,
             HANDLE_UPDATE  : self.recv_codelet,
-            HANDLE_DELETE  : self.delete_codelet,
+            HANDLE_HIDE    : self.hide_codelet,
             HANDLE_LOAD    : self.load_codelet,
             HANDLE_DISABLE : self.disable_codelet,
             HANDLE_UNDO    : self.rollback,
@@ -95,9 +95,9 @@ class App(BasicApp):
         return
 
     def enable(self):
-        """ Allows textbox and buttons being used """
+        """ Allows textbox and buttons being used """ # 
         self._is_enabled = True
-        self.workspace.text.config(state=Tk.NORMAL, bg="White")
+        self.workspace.text.config(state=Tk.NORMAL, bg="white")
         return
 
     def clear(self):
@@ -139,6 +139,8 @@ class App(BasicApp):
         self.sharedspace.codelets[codelet_id].unassign_editor()
         self.sharedspace.redraw()
         return
+
+    # Button actions
 
     def push_code_to_remote(self, event=None):
         """ Triggered by PUSH button - pushes code to the remote (and also pulls from) and resets the text box """
@@ -212,6 +214,82 @@ class App(BasicApp):
 
         return
 
+    def trigger_rollback(self, event=None):
+        """ Resets the players and deletes the last commit to the current codelet. """
+        if self._is_enabled:
+    
+            codelet_id = self.get_codelet_id()
+
+            if codelet_id != -1:
+
+                data = MESSAGE_UNDO(self.get_user_id(), self.get_codelet_id())
+
+                if self.socket.is_connected():
+
+                    self.socket.send(data)
+
+                # Clear text and reset
+
+                self.clear()
+
+        return
+
+    def toggle_view_hidden(self, event=None):
+        """ Shows any codeboxes that have been labelled as hidden """
+        if self._is_enabled:
+
+            self.sharedspace.canvas.toggle_view_hidden()
+
+            self.sharedspace.redraw()
+
+        return
+
+    def trigger_hide_codelet(self, event=None):
+        """ Labels this codelet as hidden """
+        if self._is_enabled:
+
+            codelet_id = self.get_codelet_id()
+
+            if codelet_id != -1:
+
+                data = MESSAGE_HIDE(self.get_user_id(), self.get_codelet_id())
+
+                if self.socket.is_connected():
+
+                    self.socket.send(data)
+
+                # Clear text and reset
+
+                self.clear()
+
+        return
+
+    def clear_clock(self,  event=None):
+        """ Sends a new message to the server to clear the scheduling clock """
+        if self._is_enabled:
+        
+            # Get code contents and package together with information which, if any, codelet is being sent
+
+            if self.solo_on:
+
+                self.solo_local_code()
+
+            code = "Clock.clear()"
+
+            if len(code.strip()) > 0:
+
+                data = MESSAGE_PUSH(self.get_user_id(), -1, code)
+
+                if self.socket.is_connected():
+
+                    self.socket.send(data)
+
+                # Clear text and reset
+
+                self.clear()
+
+    #####
+
     def my_id(self, user_id):
         """ Returns True if the  user id is that of the local client """
         return user_id == self.socket.user_id
@@ -220,6 +298,7 @@ class App(BasicApp):
 
     def load_codelet(self, user_id, codelet_id):
         """ Handles a codelet coming in to be edited """
+
         # If the user id is the local user, load it
         if self.my_id(user_id):
 
@@ -234,7 +313,8 @@ class App(BasicApp):
         return
 
     def load_codelet_history(self, user_id, codelet_id, data, order_id ):
-        """ Only called when connecting to a server: creates codelets and loads the history. """
+        """ Only called when connecting to a server: creates codelets and
+            runs the most recent item in the code. """
 
         user_id, string = data[0]
 
@@ -246,7 +326,7 @@ class App(BasicApp):
 
         # Evaluate the code
 
-        self.evaluate_codelet_history(codelet)
+        self.evaluate_codelet(codelet)
 
         return
 
@@ -273,14 +353,26 @@ class App(BasicApp):
 
         # Evaluate the code
 
-        self.evaluate(codelet.get_text())
+        self.evaluate_codelet(codelet)
 
         return
 
-    def delete_codelet(self, user_id, data):
+    def hide_codelet(self, user_id, codelet_id):
+        """ Labels the codelet as hidden """
+        print("Hidinig codelet", codelet_id)
+        self.get_codelet(codelet_id).hide()        
+        self.sharedspace.redraw()
         return
 
-    def rollback(self, user_id, data):
+    def rollback(self, user_id, codelet_id):
+        """ Removes the last item in the history and redraws the shared-space """
+
+        codelet = self.sharedspace.codelets[codelet_id].get_codelet()
+
+        codelet.rollback()
+
+        self.sharedspace.redraw()
+
         return
 
 

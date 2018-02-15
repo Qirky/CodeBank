@@ -13,10 +13,21 @@ class Codelet:
         self.history = []
         # Internal flags
         self.editor = None
+        self.error  = False
+        self.hidden = False
+        
         self.update(user_id, string)
 
     def update(self, user_id, string):
+        self.un_hide()
         self.history.append((user_id, string))
+        self.error = False
+        return
+
+    def rollback(self, n=1):
+        assert type(n) == int
+        if len(self.history) > 1:
+            self.history = self.history[:-n]
         return
 
     def load_history(self, data):
@@ -35,6 +46,15 @@ class Codelet:
     def is_being_edited(self):
         return self.editor is not None
 
+    def is_hidden(self):
+        return self.hidden
+
+    def hide(self):
+        self.hidden = True
+
+    def un_hide(self):
+        self.hidden = False
+
     def assign_editor(self, user_id):
         self.editor = user_id
         return
@@ -45,3 +65,11 @@ class Codelet:
 
     def get_history(self):
         return self.history
+
+    def flag_error(self):
+        """ Turns the internal error (i.e. code contained error) flag to True """
+        self.error = True
+        return
+
+    def has_error(self):
+        return self.error

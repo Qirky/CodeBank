@@ -93,7 +93,21 @@ class BasicApp:
         
         if self.lang is not None:
 
-            self.lang.execute(code)
+            return self.lang.execute(code)
+
+        return
+
+    def evaluate_codelet(self, codelet):
+        """ Takes an instance of Codelet or CodeBox and evaluates the code. If there
+            is an error, flag it with the codelet """
+
+        string = self.evaluate(codelet.get_text())
+
+        if contains_error(string):
+
+            codelet.flag_error()
+
+        self.sharedspace.redraw()
 
         return
 
@@ -106,6 +120,9 @@ class BasicApp:
     def get_codelets(self):
         """ Returns the list of code-box abstractions of the stored codelets  """
         return self.sharedspace.codelets.values()
+
+    def get_codelet(self, codelet_id):
+        return self.sharedspace.codelets[codelet_id].get_codelet()
 
     def add_user(self, user_id, name):
         """ Stores a user's name and associates it with their ID - also updates UI based on this info """

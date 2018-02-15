@@ -1,4 +1,4 @@
-from ...utils import GET_USER_COLOUR, GET_DISABLED_COLOUR
+from ...utils import *
 from ..tkimport import Tk
 
 class CodeBox:
@@ -19,7 +19,32 @@ class CodeBox:
         return self.codelet.get_text()
 
     def get_colour(self):
-        return GET_USER_COLOUR(self.codelet.get_user_id()) if self.codelet.editor is None else GET_DISABLED_COLOUR()
+        """ Returns the appropriate background colour based on the state of the codelet """
+        if self.codelet.is_being_edited():
+            colour = GET_DISABLED_COLOUR()
+        elif self.codelet.has_error():
+            colour = GET_ERROR_COLOUR()
+        else:
+            colour = GET_USER_COLOUR(self.codelet.get_user_id())
+        if self.codelet.is_hidden():
+            colour = avg_colour(colour, "#ffffff", 0.25)
+        return colour
+
+    def get_font_colour(self):
+        """ Returns the appropriate font colour based on the state of the codelet """
+        if self.codelet.is_being_edited():
+            return GET_DISABLED_FONT_COLOUR()
+        elif self.codelet.has_error():
+            return GET_ERROR_FONT_COLOUR()
+        else:
+            return GET_USER_FONT_COLOUR(self.codelet.get_user_id())
+        return
+
+    def get_user_colour(self):
+        if self.codelet.is_being_edited():
+            return GET_USER_COLOUR(self.codelet.get_user_id())
+        else:
+            return "Black"
 
     def text_tag(self):
         return "tag_{}_text".format(self.codelet.get_id())
@@ -38,20 +63,17 @@ class CodeBox:
     def draw(self, x_pos, y_pos):
         """ Draws the codebox to fit, returns the dimensions """
 
-        # First, delete
-
-        self.clear()
-
         canvas = self.parent.canvas # for easier reference
 
-        # Draw text
+        # Draw text -- not possible to do syntax highlighting?
         
         self.id = canvas.create_text(x_pos, y_pos, 
             anchor=Tk.NW, 
             text=self.get_text(), 
             width=canvas.get_width(), 
             tags=self.text_tag(),
-            font=self.root.font)
+            font=self.root.font,
+            fill=self.get_font_colour())
 
         # Work out height of text
 
@@ -62,7 +84,10 @@ class CodeBox:
 
         # Draw background
 
-        self.bg = canvas.create_rectangle([bounds[0], bounds[1], canvas.get_width(), bounds[3]], fill=self.get_colour(), tag=self.bg_tag())
+        self.bg = canvas.create_rectangle([bounds[0], bounds[1], canvas.get_width(), bounds[3]], 
+            fill=self.get_colour(), 
+            tag=self.bg_tag(),
+            outline=self.get_user_colour())
 
         bounds = canvas.bbox(self.bg)
 
@@ -73,9 +98,9 @@ class CodeBox:
 
         canvas.tag_lower(self.bg, self.id)
 
-        if self.codelet.editor is not None:
+        # if self.codelet.editor is not None:
 
-            pass # TODO -- give some information about the user edting that code
+        #     pass # TODO -- give some information about the user edting that code. 
 
         # Add callback
 
@@ -134,3 +159,18 @@ class CodeBox:
 
     def load_history(self, data):
         return self.codelet.load_history(data)
+
+    def flag_error(self):
+        return self.codelet.flag_error()
+
+    def has_error(self):
+        return  self.codelet.has_error()
+
+    def is_hidden(self):
+        return self.codelet.is_hidden()
+
+    def hide(self):
+        return self.codelet.hide()
+
+    def un_hide(self):
+        return self.codelet.un_hide()
