@@ -50,8 +50,8 @@ class Server(ThreadedServer):
         #self.__order_id    = 0
         self.__codelet_id  = 0
         self.__client_id   = 0
-        self.clients       = []
-        self.users         = {} 
+        self.clients       = [] # Client objects
+        self.users         = {} # ID: Name
 
         # Instantiate server process
 
@@ -247,6 +247,12 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def pull_all_code(self):
         """ Sends all current codelet data to the client """
+        # Get all the connected users
+        for id_num, name in self.master.users.items():
+            if id_num != self.get_user_id():
+                self.send(MESSAGE_NAME(id_num, name))
+
+        # Get all the code
         for codelet in self.master.app.get_codelets():
             # data = MESSAGE_UPDATE(codelet.get_user_id(), codelet.get_id(), codelet.get_text(), codelet.get_order_id())
             data = MESSAGE_HISTORY(-1, codelet.get_id(), codelet.get_history(), codelet.get_order_id())
@@ -270,6 +276,12 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def get_user_id(self):
         return self.user_id
+
+    def get_username(self):
+        return self.name
+
+    def get_user_info(self):
+        return (self.get_user_id(), self.get_username())
 
 
 class Client:

@@ -1,5 +1,26 @@
-import json
+import sys, json
 from socket import error as socket_error
+
+# System info
+
+SYSTEM  = 0
+WINDOWS = 0
+LINUX   = 1
+MAC_OS  = 2
+
+if sys.platform.startswith('darwin'):
+
+    SYSTEM = MAC_OS
+
+elif sys.platform.startswith('win'):
+
+    SYSTEM = WINDOWS
+
+elif sys.platform.startswith('linux'):
+
+    SYSTEM = LINUX
+
+CONTROL_KEY = "Command" if SYSTEM == MAC_OS else "Control"
 
 # Handler codes
 
@@ -126,9 +147,9 @@ def avg_colour(col1, col2, weight=0.5):
 USER_COLOURS = [ 
     "#66D9EF", 
     "#ff8000", 
-    "1e90ff",
+    "#1e90ff",
     "#A6E22E", 
-    "ff1493",
+    "#ff1493",
     ]
 
 def GET_USER_COLOUR(i):

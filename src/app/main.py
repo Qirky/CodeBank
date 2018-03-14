@@ -83,8 +83,14 @@ class BasicApp:
         packet = data[2:]
     
         handle = self.handlers[header]
-    
-        handle(userid, *packet)
+
+        try:   
+        
+            handle(userid, *packet)
+
+        except RuntimeError:
+
+            pass
         
         return
 

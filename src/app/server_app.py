@@ -26,15 +26,6 @@ class ServerApp(BasicApp):
         # user_id to codelet_id / None
         self.users = {}
 
-    def evaluate(self, code):
-        """ Passes a string to FoxDot to exectute """
-        
-        if self.lang is not None:
-
-            self.lang.execute(code)
-
-        return
-
     # Handler methods
 
     def handle_kill(self, user_id):
@@ -79,12 +70,12 @@ class ServerApp(BasicApp):
         """ Flags a codelet to be disabled i.e. cannot be loaded """
         return
 
-    def handle_recv_codelet(self, user_id, code_id, string):
+    def handle_recv_codelet(self, user_id, codelet_id, string):
         """ Handles a new/updated codelet received from a user """
 
         # Find the code_id
 
-        codelet = self.sharedspace.codelets.get(code_id, None)
+        codelet = self.sharedspace.codelets.get(codelet_id, None)
 
         if codelet is not None:
 
@@ -112,7 +103,7 @@ class ServerApp(BasicApp):
 
     def handle_release_codelet(self, user_id, codelet_id):
         """ Un-locks a codelet to be re-edited with no changes """
-        self.sharedspace.codelets[codelet_id].unassign_editor()
+        self.get_codelet(codelet_id).unassign_editor()
         self.sharedspace.redraw()
         self.socket.send_to_all(MESSAGE_RELEASE(user_id, codelet_id))
         return
@@ -126,13 +117,7 @@ class ServerApp(BasicApp):
 
     def handle_rollback(self, user_id, codelet_id):
         """ Removes the last item in the history and redraws the shared-space """
-
-        codelet = self.sharedspace.codelets[codelet_id].get_codelet()
-
-        codelet.rollback()
-
+        self.get_codelet(codelet_id).rollback()
         self.sharedspace.redraw()
-
         self.socket.send_to_all(MESSAGE_UNDO(user_id, codelet_id))
-
         return

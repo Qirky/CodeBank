@@ -1,4 +1,5 @@
 from ..tkimport import Tk
+from ...utils import CONTROL_KEY
 
 class TextInput(Tk.Text):
     """docstring for TextInput"""
@@ -23,6 +24,13 @@ class TextInput(Tk.Text):
 
         self.bind("<Key>",       self.keypress)
 
+        # Over-ride Key binding for undo/redo shortcuts : TODO - add to Menu
+
+        self.bind("<{}-z>".format(CONTROL_KEY), lambda e: None)
+        self.bind("<{}-y>".format(CONTROL_KEY), lambda e: None)
+
+        self.config(undo=True, autoseparators=True, maxundo=50)
+
         self.key_down = False
 
     @staticmethod
@@ -39,17 +47,20 @@ class TextInput(Tk.Text):
         """ Sets the contents of the text box """
         self.clear()
         self.insert("1.0", text)
+        self.edit_reset()
         self.update_colours()
         return
 
     def clear(self):
         """ Deletes the contents of the text box """
         self.delete(1.0, Tk.END)
+        self.edit_reset()
         return
 
     def keypress(self, event):
         """ Inserts a character and then updates the syntax formatting """
         if event.keysym == "BackSpace":
+            self.edit_separator()
             return
         elif event.char != "":
             if event.char == "\r":
@@ -61,6 +72,7 @@ class TextInput(Tk.Text):
             index = self.index(Tk.INSERT)
             self.insert(index, char)
             self.update_colours()
+            self.edit_separator()
             return "break"
         return
 

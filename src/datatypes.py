@@ -1,10 +1,3 @@
-class User:
-    def __init__(self, id_num, name):
-        self.id = id_num
-        self.name = name
-    def __repr__(self):
-        return self.name
-
 class Codelet:
     def __init__(self, id_num, user_id, string):
         # Unique identifier
@@ -19,9 +12,11 @@ class Codelet:
         self.update(user_id, string)
 
     def update(self, user_id, string):
+        """ Updates the contents of the codelet text - only changes the user if the string has been changed """
         self.un_hide()
-        self.history.append((user_id, string))
-        self.error = False
+        if string != self.get_text():
+            self.history.append((user_id, string))
+            self.error = False
         return
 
     def rollback(self, n=1):
@@ -42,6 +37,9 @@ class Codelet:
 
     def get_user_id(self):
         return self.history[-1][0]
+
+    def get_editor(self):
+        return self.editor
 
     def is_being_edited(self):
         return self.editor is not None

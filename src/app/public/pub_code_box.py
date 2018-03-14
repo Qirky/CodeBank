@@ -41,8 +41,9 @@ class CodeBox:
         return
 
     def get_user_colour(self):
+        """ Returns the colour of the user editing this codebox - Black if not being edited """
         if self.codelet.is_being_edited():
-            return GET_USER_COLOUR(self.codelet.get_user_id())
+            return GET_USER_COLOUR(self.codelet.get_editor())
         else:
             return "Black"
 
@@ -97,10 +98,6 @@ class CodeBox:
         # Make sure background is lower than text
 
         canvas.tag_lower(self.bg, self.id)
-
-        # if self.codelet.editor is not None:
-
-        #     pass # TODO -- give some information about the user edting that code. 
 
         # Add callback
 

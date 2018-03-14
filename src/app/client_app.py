@@ -103,7 +103,6 @@ class App(BasicApp):
     def clear(self):
         """ Clears the text box and resets the codelet we're working on """
         self.workspace.text.clear()
-        # TODO - remove undo stack
 
         # Send a message to un-edit the code on the server
         if self.get_codelet_id() != -1:
