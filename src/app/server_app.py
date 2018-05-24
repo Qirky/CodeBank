@@ -7,7 +7,7 @@ class ServerApp(BasicApp):
         
         BasicApp.__init__(self, *args, **kwargs)
 
-        self.root.title("CodeBank Server")
+        self.root.title("CodeBank Server: {}".format(self.socket.hostname))
 
         # Data handlers to handle messages from the clients
 

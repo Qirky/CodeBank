@@ -27,23 +27,17 @@ class Server(ThreadedServer):
 
             sys.exit("Exited")
 
-        # Address information
-        self.hostname = str(socket.gethostname())
-
         # Listen on any IP
-        self.ip_addr  = "0.0.0.0"
+        self.listening_address  = "0.0.0.0"
         self.port     = int(port)
-
-        # Public ip for server is the first IPv4 address we find, else just show the hostname
-        self.ip_pub = self.hostname
         
-        try:
-            for info in socket.getaddrinfo(socket.gethostname(), None):
-                if info[0] == 2:
-                    self.ip_pub = info[4][0]
-                    break
-        except socket.gaierror:
-            pass
+        # Get IP address
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        self.hostname = s.getsockname()[0]
+        s.close()
+
+        self.address = (self.hostname, self.port)
 
         # Keep track of all the connected clients
 
@@ -57,7 +51,7 @@ class Server(ThreadedServer):
 
         RequestHandler.set_master(self)
 
-        ThreadedServer.__init__(self, (self.ip_addr, self.port), RequestHandler)
+        ThreadedServer.__init__(self, (self.listening_address, self.port), RequestHandler)
 
         self.server_thread = Thread(target=self.serve_forever)
         self.running = False
@@ -69,7 +63,7 @@ class Server(ThreadedServer):
         self.app = ServerApp(self, FoxDot)
 
     def __str__(self):
-        return "{} on port {}\n".format(self.ip_pub, self.port)
+        return "{} on port {}\n".format(self.hostname, self.port)
 
     def start(self):
         """ Starts listening on the socket """

@@ -91,8 +91,8 @@ class Client:
             data = read_from_socket(self.socket)
             if data is None:
                 return 0
-        except ValueError:
-            raise ConnectionError("Connection lost to server.")
+        except ValueError as e:
+            raise ConnectionError("Connection lost to server. {}".format(e))
         self.app.handle_data(data)
         return 1
 

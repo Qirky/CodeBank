@@ -33,7 +33,8 @@ class Codelet:
         return self.id
 
     def get_text(self):
-        return self.history[-1][1]
+        """ Returns the *current* text of the codelet (empty string if no updates) """
+        return self.history[-1][1] if len(self.history) else ""
 
     def get_user_id(self):
         return self.history[-1][0]

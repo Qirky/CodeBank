@@ -99,6 +99,8 @@ class Message:
     def as_bytes(self):
         return str(self).encode("utf-8")
 
+def bytes_to_str(data):
+    return data.decode("utf-8") if type(data) is bytes else str(data)
 
 def read_from_socket(sock):
     """ Reads data from the socket """
@@ -109,7 +111,7 @@ def read_from_socket(sock):
             # Read the remaining data (JSON)
             data = sock.recv(bits)
             # Convert back to Python data structure
-            return json.loads(data)
+            return json.loads(bytes_to_str(data))
     except (ConnectionAbortedError, ConnectionResetError):
         return None
 
