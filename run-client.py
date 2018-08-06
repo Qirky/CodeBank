@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-from __future__ import absolute_import
+import sys
+
+if sys.version_info.major <= 2:
+
+    sys.exit("Error: 'CodeBank' requires Python 3.5 and above to run correctly.")
+
 from src.client import Client
 
 myApp = Client()
