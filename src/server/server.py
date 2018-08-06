@@ -1,4 +1,10 @@
-import socketserver
+from __future__ import absolute_import, print_function
+
+try:
+    import socketserver
+except ImportError:
+    import SocketServer as socketserver
+
 import socket
 import json
 import sys

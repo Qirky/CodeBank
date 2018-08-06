@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function
+
 from ..tkimport import Tk
 from .pub_canvas import SharedCanvas
 from .pub_code_box import CodeBox

@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function
+
 from ...utils import GET_USER_COLOUR
 from ..tkimport import Tk
 

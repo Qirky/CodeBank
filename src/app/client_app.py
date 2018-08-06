@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function
+
 from .main import *
 from .connection_input import popup_window
 from ..utils import get_players

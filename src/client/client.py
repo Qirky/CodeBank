@@ -1,10 +1,12 @@
+from __future__ import absolute_import, print_function
+
 import socket
 from threading import Thread
 from hashlib import md5
 from ..utils import *
 from ..app import *
 
-import FoxDot
+import FoxDot # should pipe to FoxDot
 
 # FoxDot = None
 

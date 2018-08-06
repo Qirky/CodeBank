@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function
+
 from ..tkimport import Tk
 from ...utils import CONTROL_KEY
 

@@ -1,3 +1,4 @@
+from __future__ import absolute_import, print_function
 from ..tkimport import Tk
 
 class CommandButtons(Tk.Frame):

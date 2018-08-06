@@ -1,3 +1,4 @@
+from __future__ import absolute_import, print_function
 from .main import *
 
 # Class for interface on the ServerSide (shown to audience)
