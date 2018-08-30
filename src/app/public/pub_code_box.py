@@ -6,7 +6,7 @@ from ..tkimport import Tk
 class CodeBox:
     padx = 10
     pady = 10
-    bordersize = 2
+    bordersize = 4
     def __init__(self, parent, codelet, order_number):
         self.parent = parent
         self.root   = parent.parent
@@ -90,7 +90,8 @@ class CodeBox:
         self.bg = canvas.create_rectangle([bounds[0] - self.padx, bounds[1] - self.pady, canvas.get_width(), bounds[3] + self.pady], 
             fill=self.get_colour(), 
             tag=self.bg_tag(),
-            outline=self.get_user_colour())
+            outline=self.get_user_colour(),
+            width=self.bordersize)
 
         bounds = canvas.bbox(self.bg)
 
