@@ -39,7 +39,8 @@ class Workspace(Tk.Frame):
         self.text = TextInput(self, height=10, font=self.parent.font)
         self.text.grid(row=1, column=0, sticky=Tk.NSEW)
 
-        self.text.bind("<Control-Return>", self.evaluate_code_locally)
+        self.text.bind("<{}-Return>".format(CONTROL_KEY), self.evaluate_code_locally)
+        self.text.bind("<{}-Shift-Return>".format(CONTROL_KEY), self.parent.push_code_to_remote)
 
         # Console
 
