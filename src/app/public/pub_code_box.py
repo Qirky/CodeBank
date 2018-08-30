@@ -4,6 +4,9 @@ from ...utils import *
 from ..tkimport import Tk
 
 class CodeBox:
+    padx = 10
+    pady = 10
+    bordersize = 2
     def __init__(self, parent, codelet, order_number):
         self.parent = parent
         self.root   = parent.parent
@@ -70,10 +73,10 @@ class CodeBox:
 
         # Draw text -- not possible to do syntax highlighting?
         
-        self.id = canvas.create_text(x_pos, y_pos, 
+        self.id = canvas.create_text(x_pos + self.padx, y_pos + self.pady, 
             anchor=Tk.NW, 
             text=self.get_text(), 
-            width=canvas.get_width(), 
+            width=canvas.get_width() - (self.padx * 2), 
             tags=self.text_tag(),
             font=self.root.font,
             fill=self.get_font_colour())
@@ -82,12 +85,9 @@ class CodeBox:
 
         bounds = canvas.bbox(self.id) 
 
-        width  = bounds[2] - bounds[0]
-        height = bounds[3] - bounds[1]
-
         # Draw background
 
-        self.bg = canvas.create_rectangle([bounds[0], bounds[1], canvas.get_width(), bounds[3]], 
+        self.bg = canvas.create_rectangle([bounds[0] - self.padx, bounds[1] - self.pady, canvas.get_width(), bounds[3] + self.pady], 
             fill=self.get_colour(), 
             tag=self.bg_tag(),
             outline=self.get_user_colour())

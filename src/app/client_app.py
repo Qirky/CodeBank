@@ -12,7 +12,14 @@ class App(BasicApp):
         BasicApp.__init__(self, *args, **kwargs)
 
         self.root.title("CodeBank Client: Not Connected")
-        self.root.state("zoomed")
+
+        try:
+
+            self.root.state("zoomed")
+
+        except Tk.TclError:
+
+            pass
 
         # Menu bar
 
