@@ -4,9 +4,9 @@ CodeBank is a collaborative performance system for live coding with FoxDot. It u
 
 ## Requirements
 
-- Python 3
-- FoxDot
-- SuperCollider
+- [Python 3](https://www.python.org/downloads/)
+- [FoxDot](https://github.com/Qirky/FoxDot)
+- [SuperCollider](http://supercollider.github.io)
 - One laptop for each user plus a machine, such as another laptop or Raspberry Pi, to run the server application
 
 ## Installation
@@ -14,9 +14,11 @@ CodeBank is a collaborative performance system for live coding with FoxDot. It u
 - Download the zip from this repository and unpack in a directory you can access easily.
 - Alternatively, build from source by cloning this repository:
 
-    git clone https://github.com/Qirky/CodeBank.git
-    cd CodeBank
-    python setup.py install
+```
+git clone https://github.com/Qirky/CodeBank.git
+cd CodeBank
+python setup.py install
+```
 
 ## Getting started
 
