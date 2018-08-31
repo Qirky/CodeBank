@@ -20,11 +20,15 @@ class SharedCanvas(Tk.Canvas):
     def toggle_view_hidden(self):
         self._switch_view_hidden = not self._switch_view_hidden
 
+    def ordered(self):
+        """ Returns the codeboxes in order of top to bottom """
+        return sorted(self.codeboxes, key=lambda x: x.order_number, reverse=True)
+
     def redraw(self):
         """ Redraws all the codebox labels in order of most recently edited """
-        ordered = sorted(self.codeboxes, key=lambda x: x.order_number, reverse=True)
         y = 0
-        for codebox in ordered:
+        for codebox in self.ordered():
+            
             # Clear screen
             codebox.clear()
 

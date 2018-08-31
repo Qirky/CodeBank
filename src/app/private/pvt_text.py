@@ -8,7 +8,9 @@ class TextInput(Tk.Text):
     def __init__(self, parent, *args, **kwargs):
         Tk.Text.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.lang   = self.parent.parent.lang
+        self.root   = self.parent.parent
+
+        self.lang   = self.root.lang
         self.lang_format = self.lang.Workspace.Format
 
         # Set some custom colours
@@ -25,6 +27,7 @@ class TextInput(Tk.Text):
         self.tag_config("highlight", background="red", foreground="white")
 
         self.bind("<Key>",       self.keypress)
+        self.bind("<Return>",    self.return_key)
 
         # Over-ride Key binding for undo/redo shortcuts : TODO - add to Menu
 
@@ -61,6 +64,9 @@ class TextInput(Tk.Text):
 
     def keypress(self, event):
         """ Inserts a character and then updates the syntax formatting """
+
+        self.root.unhighlight_all_codelets()
+
         if event.keysym == "BackSpace":
             self.edit_separator()
             return
@@ -77,6 +83,14 @@ class TextInput(Tk.Text):
             self.edit_separator()
             return "break"
         return
+
+    def return_key(self, event=None):
+        """ If a codelet is highlighted, use PULL, if not, just use the return Key"""
+        if self.root.highlighted_codelet != -1: # TODO // remove hard coding
+            self.root.request_codelet(self.root.highlighted_codelet)
+            return "break"
+        return
+
 
     def highlight(self):
         """ Highlights a chunk of text and schedules it to un-highlight 150ms later """

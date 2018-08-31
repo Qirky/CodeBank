@@ -8,6 +8,7 @@ class Codelet:
         self.editor = None
         self.error  = False
         self.hidden = False
+        self.highlighted = False
         
         self.update(user_id, string)
 
@@ -53,6 +54,15 @@ class Codelet:
 
     def un_hide(self):
         self.hidden = False
+
+    def highlight(self):
+        self.highlighted = True
+
+    def de_highlight(self):
+        self.highlighted = False
+
+    def is_highlighted(self):
+        return self.highlighted
 
     def assign_editor(self, user_id):
         self.editor = user_id

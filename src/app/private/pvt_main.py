@@ -42,6 +42,11 @@ class Workspace(Tk.Frame):
         self.text.bind("<{}-Return>".format(CONTROL_KEY), self.evaluate_code_locally)
         self.text.bind("<{}-Shift-Return>".format(CONTROL_KEY), self.push_code_to_remote)
 
+        # Canvas bindings
+
+        self.text.bind("<Alt-Up>", self.parent.highlight_codelet_up)
+        self.text.bind("<Alt-Down>", self.parent.highlight_codelet_down)
+
         # Console
 
         self.console = Console(self, font=self.parent.font)

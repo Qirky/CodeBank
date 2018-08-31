@@ -51,9 +51,17 @@ class CodeBox:
             return GET_USER_COLOUR(self.codelet.get_editor())
         else:
             return "Black"
+        return
+
+    def get_outline_colour(self):
+        if self.codelet.is_highlighted():
+            return "White"
+        else:
+            return self.get_user_colour()
+        return
 
     def get_highlight_colour(self):
-        """ Returns the colour for textbox highlting, white if not currently editing """        
+        """ Returns the colour for textbox highlting, white if not currently editing """
         if self.root.disable_codelet_highlight():
             return self.get_user_colour()
         else:
@@ -98,7 +106,7 @@ class CodeBox:
         self.bg = canvas.create_rectangle([bounds[0] - self.padx, bounds[1] - self.pady, canvas.get_width(), bounds[3] + self.pady], 
             fill=self.get_colour(), 
             tag=self.bg_tag(),
-            outline=self.get_user_colour(),
+            outline=self.get_outline_colour(),
             activeoutline=self.get_highlight_colour(),
             width=self.bordersize)
 
@@ -116,7 +124,6 @@ class CodeBox:
         for item in (self.id, self.bg):
 
             self.parent.canvas.tag_bind(item, "<ButtonPress-1>", self.on_click)
-            # self.parent.canvas.tag_bind(item, "<ButtonPress-1>", self.mouse_over)
         
         return width, height
 
@@ -184,3 +191,12 @@ class CodeBox:
 
     def un_hide(self):
         return self.codelet.un_hide()
+
+    def highlight(self):
+        """ Calls de_highlight on all codelets then highlights this one """
+        for codelet in self.parent.canvas.ordered():
+            codelet.de_highlight()
+        return self.codelet.highlight()
+
+    def de_highlight(self):
+        return self.codelet.de_highlight()
