@@ -53,6 +53,7 @@ class App(BasicApp):
 
         self.current_codelet  = -1
         self.codelet_on_click = self.request_codelet
+        self.disable_codelet_highlight = self.is_editing_codelet
 
         # Booleans
 
@@ -147,6 +148,10 @@ class App(BasicApp):
         self.sharedspace.codelets[codelet_id].unassign_editor()
         self.sharedspace.redraw()
         return
+
+    def is_editing_codelet(self):
+        """ Returns True if there is a codelet that is flagged to "editing" """
+        return self.current_codelet != -1
 
     # Button actions
 
@@ -367,7 +372,7 @@ class App(BasicApp):
 
     def hide_codelet(self, user_id, codelet_id):
         """ Labels the codelet as hidden """
-        print("Hidinig codelet", codelet_id)
+        print("Hiding codelet", codelet_id)
         self.get_codelet(codelet_id).hide()        
         self.sharedspace.redraw()
         return

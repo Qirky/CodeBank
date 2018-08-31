@@ -40,7 +40,7 @@ class Workspace(Tk.Frame):
         self.text.grid(row=1, column=0, sticky=Tk.NSEW)
 
         self.text.bind("<{}-Return>".format(CONTROL_KEY), self.evaluate_code_locally)
-        self.text.bind("<{}-Shift-Return>".format(CONTROL_KEY), self.parent.push_code_to_remote)
+        self.text.bind("<{}-Shift-Return>".format(CONTROL_KEY), self.push_code_to_remote)
 
         # Console
 
@@ -91,5 +91,12 @@ class Workspace(Tk.Frame):
         code = self.text.get_text()
 
         self.parent.evaluate(code)
+
+        return "break"
+
+    def push_code_to_remote(self, event=None):
+        """ Clears the txt box and sends code to server """
+
+        self.parent.push_code_to_remote()
 
         return "break"

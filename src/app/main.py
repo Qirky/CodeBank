@@ -58,6 +58,7 @@ class BasicApp:
         # Action for on-click of codelets
 
         self.codelet_on_click = lambda *args, **kwargs: None
+        self.disable_codelet_highlight = lambda *args, **kwargs: True
 
         # FoxDot interpreter
 

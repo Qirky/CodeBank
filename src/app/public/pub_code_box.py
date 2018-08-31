@@ -8,8 +8,8 @@ class CodeBox:
     pady = 10
     bordersize = 4
     def __init__(self, parent, codelet, order_number):
-        self.parent = parent
-        self.root   = parent.parent
+        self.parent = parent # pub_main
+        self.root   = parent.parent # main
 
         self.id = None # Used by canvas
         self.bg = None
@@ -52,6 +52,14 @@ class CodeBox:
         else:
             return "Black"
 
+    def get_highlight_colour(self):
+        """ Returns the colour for textbox highlting, white if not currently editing """        
+        if self.root.disable_codelet_highlight():
+            return self.get_user_colour()
+        else:
+            return "White"
+        return
+
     def text_tag(self):
         return "tag_{}_text".format(self.codelet.get_id())
 
@@ -91,6 +99,7 @@ class CodeBox:
             fill=self.get_colour(), 
             tag=self.bg_tag(),
             outline=self.get_user_colour(),
+            activeoutline=self.get_highlight_colour(),
             width=self.bordersize)
 
         bounds = canvas.bbox(self.bg)
@@ -102,11 +111,12 @@ class CodeBox:
 
         canvas.tag_lower(self.bg, self.id)
 
-        # Add callback
+        # Add callback bindings
 
         for item in (self.id, self.bg):
 
             self.parent.canvas.tag_bind(item, "<ButtonPress-1>", self.on_click)
+            # self.parent.canvas.tag_bind(item, "<ButtonPress-1>", self.mouse_over)
         
         return width, height
 
