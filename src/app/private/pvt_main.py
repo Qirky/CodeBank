@@ -76,7 +76,7 @@ class Workspace(Tk.Frame):
     def clear(self):
         """ Deletes the contents of the text box and sets current_codelet to None """
         self.text.clear()
-        self.parent.set_codelet_id(-1)
+        self.parent.set_codelet_id(NULL)
         return
 
     def load_from_codelet(self, codelet_id):

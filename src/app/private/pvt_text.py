@@ -1,7 +1,7 @@
 from __future__ import absolute_import, print_function
 
 from ..tkimport import Tk
-from ...utils import CONTROL_KEY
+from ...utils import CONTROL_KEY, NULL
 
 class TextInput(Tk.Text):
     """docstring for TextInput"""
@@ -86,8 +86,9 @@ class TextInput(Tk.Text):
 
     def return_key(self, event=None):
         """ If a codelet is highlighted, use PULL, if not, just use the return Key"""
-        if self.root.highlighted_codelet != -1: # TODO // remove hard coding
+        if self.root.highlighted_codelet != NULL:
             self.root.request_codelet(self.root.highlighted_codelet)
+            self.root.unhighlight_all_codelets()
             return "break"
         return
 

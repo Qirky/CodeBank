@@ -119,15 +119,23 @@ class App(BasicApp):
 
     def clear(self):
         """ Clears the text box and resets the codelet we're working on """
+        
         self.workspace.text.clear()
 
         # Send a message to un-edit the code on the server
-        if self.get_codelet_id() != -1:
+        
+        if self.get_codelet_id() != NULL:
+            
             self.socket.send( MESSAGE_RELEASE(self.get_user_id(), self.get_codelet_id()) )
-        self.set_codelet_id(-1)
+        
+        self.set_codelet_id(NULL)
+        
         return
 
     # Server communications
+
+    def get_codelet(self, codelet_id):
+        return self.sharedspace.codelets[codelet_id].get_codelet()
 
     def get_codelet_id(self):
         """ Returns the ID of the currently edited codelet"""
@@ -424,51 +432,61 @@ class App(BasicApp):
 
     def unhighlight_all_codelets(self, event=None):
         """ Sets hl codelet to -1 """
-        if self.highlighted_codelet != -1:
+        if self.highlighted_codelet != NULL:
             self.sharedspace.codelets[self.highlighted_codelet].de_highlight()
-            self.highlighted_codelet = - 1
+            self.highlighted_codelet = NULL
             self.sharedspace.canvas.redraw()
         return
 
+    def highlight_codelet(self, codelet_id):
+        """ Flags the interface to highlight a codelet """
+        if codelet_id == NULL:
+            self.unhighlight_all_codelets()
+        else:
+            self.get_codelet(codelet_id).highlight()
+            self.highlighted_codelet = codelet_id
+        return
+
+
     def highlight_codelet_up(self, event=None):
         """ Called when the user uses Alt+Up to cycle through the  """
-        if self.current_codelet == -1:
+        if self.current_codelet == NULL:
             codeboxes = list(self.sharedspace.canvas.ordered())
             if self.highlighted_codelet == -1:
                 # Get bottom codebox
-                codelet = codeboxes[-1]
+                codebox = codeboxes[-1]
             else:
                 # Find the codebox above the current one
-                codelet = codeboxes[0]
+                codebox = codeboxes[0]
                 for n in range( len( codeboxes ) - 1 ):
                     this_codebox = codeboxes[n + 1]
                     if this_codebox.codelet.id == self.highlighted_codelet:
+                        this_codebox.codelet.de_highlight()
                         break
-                    codelet = this_codebox
+                    codebox = this_codebox
                 else:
-                    codelet = codeboxes[0]
-            codelet.highlight()
-            self.highlighted_codelet = codelet.codelet.id
+                    codebox = codeboxes[0]
+            self.highlight_codelet(codebox.codelet.id)
             self.sharedspace.canvas.redraw()
         else:
             return "break"
 
     def highlight_codelet_down(self, event=None):
-        if self.current_codelet == -1:
+        if self.current_codelet == NULL:
             codeboxes = list(self.sharedspace.canvas.ordered())
             if self.highlighted_codelet == -1:
                 # Get bottom codebox
-                codelet = codeboxes[0]
+                codebox = codeboxes[0]
             else:
                 # Find the codebox above the current one
-                codelet = codeboxes[-1]
+                codebox = codeboxes[-1]
                 for n in range( len( codeboxes ), 0, -1 ):
                     this_codebox = codeboxes[n - 1]
                     if this_codebox.codelet.id == self.highlighted_codelet:
+                        this_codebox.codelet.de_highlight()
                         break
-                    codelet = this_codebox
-            codelet.highlight()
-            self.highlighted_codelet = codelet.codelet.id
+                    codebox = this_codebox
+            self.highlight_codelet(codebox.codelet.id)
             self.sharedspace.canvas.redraw()
         else:
             return "break"

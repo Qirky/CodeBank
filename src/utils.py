@@ -80,6 +80,10 @@ def MESSAGE_UNDO(user_id, codelet_id):
 def MESSAGE_HIDE(user_id, codelet_id):
     return [HANDLE_HIDE, user_id, codelet_id]
 
+# Special case codelet IDs
+
+NULL = -1
+
 # Class and functions for creating and sending messages to the server/clients
 
 class Message:

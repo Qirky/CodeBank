@@ -9,7 +9,7 @@ class CodeBox:
     bordersize = 4
     def __init__(self, parent, codelet, order_number):
         self.parent = parent # pub_main
-        self.root   = parent.parent # main
+        self.root   = parent.parent # client_app
 
         self.id = None # Used by canvas
         self.bg = None
@@ -107,7 +107,6 @@ class CodeBox:
             fill=self.get_colour(), 
             tag=self.bg_tag(),
             outline=self.get_outline_colour(),
-            activeoutline=self.get_highlight_colour(),
             width=self.bordersize)
 
         bounds = canvas.bbox(self.bg)
@@ -124,6 +123,8 @@ class CodeBox:
         for item in (self.id, self.bg):
 
             self.parent.canvas.tag_bind(item, "<ButtonPress-1>", self.on_click)
+            self.parent.canvas.tag_bind(item, "<Enter>", self.on_enter)
+            self.parent.canvas.tag_bind(item, "<Leave>", self.on_leave)
         
         return width, height
 
@@ -135,6 +136,24 @@ class CodeBox:
         
     def on_click(self, event=None):
         self.root.codelet_on_click(self.codelet.get_id())
+        self.de_highlight()
+        return
+
+    def on_enter(self, event=None): # could use this instead of active colour?
+        # if not currently editing
+        if not self.root.disable_codelet_highlight():
+            self.highlight()
+            self.root.root.config(cursor="hand2")
+        else:
+            self.root.root.config(cursor="")
+        return
+
+    def on_leave(self, event=None):
+        # if not currently editing
+        if not self.root.disable_codelet_highlight():
+            # self.parent.codelets[self.root.highlighted_codelet].de_highlight()
+            self.de_highlight()
+        self.root.root.config(cursor="")
         return
 
     def get_order_id(self):
@@ -196,7 +215,13 @@ class CodeBox:
         """ Calls de_highlight on all codelets then highlights this one """
         for codelet in self.parent.canvas.ordered():
             codelet.de_highlight()
-        return self.codelet.highlight()
+        self.codelet.highlight()
+        self.root.highlighted_codelet = self.codelet.id
+        self.parent.canvas.itemconfig(self.bg, outline=self.get_outline_colour())
+        return 
 
     def de_highlight(self):
-        return self.codelet.de_highlight()
+        self.codelet.de_highlight()
+        self.root.highlighted_codelet = NULL
+        self.parent.canvas.itemconfig(self.bg, outline=self.get_outline_colour())
+        return 
