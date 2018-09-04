@@ -151,7 +151,6 @@ class CodeBox:
     def on_leave(self, event=None):
         # if not currently editing
         if not self.root.disable_codelet_highlight():
-            # self.parent.codelets[self.root.highlighted_codelet].de_highlight()
             self.de_highlight()
         self.root.root.config(cursor="")
         return

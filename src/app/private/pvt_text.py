@@ -28,6 +28,7 @@ class TextInput(Tk.Text):
 
         self.bind("<Key>",       self.keypress)
         self.bind("<Return>",    self.return_key)
+        self.bind("<Escape>",    lambda *e: self.root.reset_program_state())
 
         # Over-ride Key binding for undo/redo shortcuts : TODO - add to Menu
 

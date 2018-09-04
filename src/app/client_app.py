@@ -2,7 +2,7 @@ from __future__ import absolute_import, print_function
 
 from .main import *
 from .connection_input import popup_window
-from ..utils import get_players
+from ..utils import get_players, NULL
 
 # Class for interface for client-side
 
@@ -51,8 +51,8 @@ class App(BasicApp):
 
         # This stores the codelet being currently edited
 
-        self.current_codelet  = -1
-        self.highlighted_codelet = -1
+        self.current_codelet  = NULL
+        self.highlighted_codelet = NULL
 
         self.sharedspace.canvas.bind("<Enter>", self.unhighlight_all_codelets)
         self.sharedspace.canvas.bind("<Leave>", self.unhighlight_all_codelets)
@@ -152,7 +152,7 @@ class App(BasicApp):
     def request_codelet(self, codelet_id):
         """ Triggered by clicking on a codebox. Sends a message to the server to request edit
             permissions for that codelet """
-        if self.get_codelet_id() == -1:
+        if self.get_codelet_id() == NULL:
 
             self.socket.send(MESSAGE_REQUEST(self.get_user_id(), codelet_id))
 
@@ -166,7 +166,7 @@ class App(BasicApp):
 
     def is_editing_codelet(self):
         """ Returns True if there is a codelet that is flagged to "editing" """
-        return self.current_codelet != -1
+        return self.current_codelet != NULL
 
     # Button actions
 
@@ -232,7 +232,7 @@ class App(BasicApp):
 
             codelet_id = self.get_codelet_id()
 
-            if codelet_id != -1:
+            if codelet_id != NULL:
 
                 codelet = self.sharedspace.codelets[codelet_id].get_codelet()
 
@@ -248,7 +248,7 @@ class App(BasicApp):
     
             codelet_id = self.get_codelet_id()
 
-            if codelet_id != -1:
+            if codelet_id != NULL:
 
                 data = MESSAGE_UNDO(self.get_user_id(), self.get_codelet_id())
 
@@ -278,7 +278,7 @@ class App(BasicApp):
 
             codelet_id = self.get_codelet_id()
 
-            if codelet_id != -1:
+            if codelet_id != NULL:
 
                 data = MESSAGE_HIDE(self.get_user_id(), self.get_codelet_id())
 
