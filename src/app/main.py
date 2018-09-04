@@ -48,12 +48,16 @@ class BasicApp:
         self.font = tkFont.Font(font=(self.default_font, 12), name="CodeFont")
         self.font.configure(family=self.default_font)
 
+        self.root.bind("<{}-equal>".format(CONTROL_KEY), self.increase_font_size)
+        self.root.bind("<{}-minus>".format(CONTROL_KEY), self.decrease_font_size)
+
         # Socket is an instance of Client
         self.socket = client
 
         # Top canvas box for containing code blocks
         self.sharedspace = SharedSpace(self)
         self.sharedspace.grid(row=0, column=0)
+        # self.sharedspace.grid_propagate(False)
 
         # Action for on-click of codelets
 
@@ -143,3 +147,22 @@ class BasicApp:
         del self.socket.users[user_id]
         self.sharedspace.peer_box.remove_user(user_id)
         return
+
+    def increase_font_size(self, event=None):
+        font = tkFont.nametofont("CodeFont")
+        size = font.actual()["size"]+2
+        font.configure(size=size)
+        return "break"
+
+    def decrease_font_size(self, event=None):
+        font = tkFont.nametofont("CodeFont")
+        size = max(font.actual()["size"]-2, 8)
+        font.configure(size=size)
+        return "break"
+
+    # Override
+    def get_cursor_icon(self):
+        return ""
+
+    def get_active_cursor_icon(self):
+        return ""

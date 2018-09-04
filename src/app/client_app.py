@@ -30,6 +30,7 @@ class App(BasicApp):
 
         self.workspace = Workspace(self)
         self.workspace.grid(row=2, column=0, sticky=Tk.NSEW, columnspan=2)
+        self.workspace.propagate(False)
 
         # Data handlers to handle messages from the server
 
