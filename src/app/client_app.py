@@ -65,6 +65,7 @@ class App(BasicApp):
         # Booleans
 
         self.solo_on = False
+        self.selecting_codelet_to_hide = False
 
         # Don't allow users to use buttons / text box until connected
 
@@ -145,6 +146,14 @@ class App(BasicApp):
         """ Returns the local user's id """
         return self.socket.user_id
 
+    def get_cursor_icon(self):
+        """ Returns the Tkinter string name for the icon that the cursor should be displaying"""
+        return "exchange" if self.selecting_codelet_to_hide else ""
+
+    def get_active_cursor_icon(self):
+        """ Returns the Tkinter string name for the icon that the cursor should be displayed when hovering on a codebox"""
+        return "exchange" if self.selecting_codelet_to_hide else "hand2"
+
     def set_codelet_id(self, c_id):
         self.current_codelet = c_id
         return
@@ -154,7 +163,17 @@ class App(BasicApp):
             permissions for that codelet """
         if self.get_codelet_id() == NULL:
 
-            self.socket.send(MESSAGE_REQUEST(self.get_user_id(), codelet_id))
+            # Hide the codelet if we are doing that
+
+            if self.selecting_codelet_to_hide:
+
+                self.send_hide_codelet(codelet_id)
+
+            # If not, request to edit
+
+            else:
+
+                self.socket.send(MESSAGE_REQUEST(self.get_user_id(), codelet_id))
 
         return
 
@@ -268,6 +287,8 @@ class App(BasicApp):
 
             self.sharedspace.canvas.toggle_view_hidden()
 
+            self.workspace.commands.button["TOGGLE HIDDEN"].toggle()
+
             self.sharedspace.redraw()
 
         return
@@ -280,15 +301,45 @@ class App(BasicApp):
 
             if codelet_id != NULL:
 
-                data = MESSAGE_HIDE(self.get_user_id(), self.get_codelet_id())
+                # Use currently selected 
 
-                if self.socket.is_connected():
-
-                    self.socket.send(data)
+                self.send_hide_codelet(codelet_id)
 
                 # Clear text and reset
 
                 self.clear()
+
+            # If not editing, clicking hide lets us select a codelet to hide
+
+            else:
+
+                self.toggle_selecting_codelet_to_hide()
+
+        return
+
+    def toggle_selecting_codelet_to_hide(self):
+        """ Switch on/off the selecting to hide feature """
+        if self.selecting_codelet_to_hide:
+            self.selecting_codelet_to_hide = False
+            
+        else:
+            self.selecting_codelet_to_hide = True
+        self.workspace.commands.button["HIDE"].toggle()
+        self.root.config(cursor=self.get_cursor_icon())
+        return
+
+    def send_hide_codelet(self, codelet_id):
+        """ Sends a message to the server to hide a codelet from view """
+        
+        data = MESSAGE_HIDE(self.get_user_id(), codelet_id)
+
+        if self.socket.is_connected():
+
+            self.socket.send(data)
+
+        if self.selecting_codelet_to_hide:
+
+            self.toggle_selecting_codelet_to_hide()
 
         return
 

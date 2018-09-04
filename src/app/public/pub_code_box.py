@@ -32,7 +32,7 @@ class CodeBox:
         else:
             colour = GET_USER_COLOUR(self.codelet.get_user_id())
         if self.codelet.is_hidden():
-            colour = avg_colour(colour, "#ffffff", 0.25)
+            colour = avg_colour(colour, "#d3d3d3", 0.75)
         return colour
 
     def get_font_colour(self):
@@ -141,18 +141,19 @@ class CodeBox:
 
     def on_enter(self, event=None): # could use this instead of active colour?
         # if not currently editing
+
         if not self.root.disable_codelet_highlight():
             self.highlight()
-            self.root.root.config(cursor="hand2")
+            self.root.root.config(cursor=self.root.get_active_cursor_icon())
         else:
-            self.root.root.config(cursor="")
+            self.root.root.config(cursor=self.root.get_cursor_icon())
         return
 
     def on_leave(self, event=None):
         # if not currently editing
         if not self.root.disable_codelet_highlight():
             self.de_highlight()
-        self.root.root.config(cursor="")
+        self.root.root.config(cursor=self.root.get_cursor_icon())
         return
 
     def get_order_id(self):

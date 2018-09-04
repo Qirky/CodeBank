@@ -17,6 +17,23 @@ class CommandButtons(Tk.Frame):
 
         for i, name in enumerate(self.names):
 
-            self.button[name] = Tk.Button(self, text=name, relief=Tk.RAISED, borderwidth=1, command=self.commands[name]) # Maybe use a label
+            self.button[name] = Button(self, text=name, borderwidth=1, command=self.commands[name]) # Maybe use a label
             self.button[name].grid(row=0, column=self.num_buttons, padx=4)
             self.num_buttons += 1
+
+
+class Button(Tk.Button):
+    def __init__(self, *args, **kwargs):
+        Tk.Button.__init__(self, *args, **kwargs)
+        self.config(relief=Tk.RAISED)
+        self._switch = False
+
+    def toggle(self):
+        if self._switch is True:
+            self._switch = False
+            self.config(relief=Tk.RAISED)
+        else:
+            self._switch = True
+            self.config(relief=Tk.SUNKEN)
+        return
+
