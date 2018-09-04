@@ -22,7 +22,10 @@ class SharedCanvas(Tk.Canvas):
 
     def ordered(self):
         """ Returns the codeboxes in order of top to bottom """
-        return sorted(self.codeboxes, key=lambda x: x.order_number, reverse=True)
+        return sorted(self.codeboxes, key=lambda x: x.get_order_id(), reverse=True)
+
+    def visible_codelets(self):
+        return [codebox for codebox in self.ordered() if codebox.is_visible()]
 
     def redraw(self):
         """ Redraws all the codebox labels in order of most recently edited """

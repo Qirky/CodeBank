@@ -427,7 +427,7 @@ class App(BasicApp):
 
         else:
 
-            codelet = Codelet(code_id, user_id, string)
+            codelet = Codelet(code_id, user_id, string, order_id)
 
             self.sharedspace.add_codelet(codelet)
 
@@ -439,7 +439,7 @@ class App(BasicApp):
 
     def hide_codelet(self, user_id, codelet_id):
         """ Labels the codelet as hidden """
-        print("Hiding codelet", codelet_id)
+        print("Hiding codelet num. {}".format(codelet_id))
         self.get_codelet(codelet_id).hide()        
         self.sharedspace.redraw()
         return
@@ -503,7 +503,7 @@ class App(BasicApp):
     def highlight_codelet_up(self, event=None):
         """ Called when the user uses Alt+Up to cycle through the  """
         if self.current_codelet == NULL:
-            codeboxes = list(self.sharedspace.canvas.ordered())
+            codeboxes = self.sharedspace.canvas.visible_codelets()
             if self.highlighted_codelet == -1:
                 # Get bottom codebox
                 codebox = codeboxes[-1]
@@ -525,7 +525,7 @@ class App(BasicApp):
 
     def highlight_codelet_down(self, event=None):
         if self.current_codelet == NULL:
-            codeboxes = list(self.sharedspace.canvas.ordered())
+            codeboxes = self.sharedspace.canvas.visible_codelets()
             if self.highlighted_codelet == -1:
                 # Get bottom codebox
                 codebox = codeboxes[0]

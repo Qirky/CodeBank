@@ -7,7 +7,7 @@ class CodeBox:
     padx = 10
     pady = 10
     bordersize = 4
-    def __init__(self, parent, codelet, order_number):
+    def __init__(self, parent, codelet):
         self.parent = parent # pub_main
         self.root   = parent.parent # client_app
 
@@ -15,7 +15,6 @@ class CodeBox:
         self.bg = None
         
         self.codelet = codelet
-        self.order_number = int(order_number)
 
         self.parent.canvas.add(self)
         self.parent.canvas.redraw()
@@ -76,9 +75,8 @@ class CodeBox:
 
     def update(self, user_id, string, order_number):
         """ Called when a codelet is pushed with an existing ID """
-        self.codelet.update(user_id, string)
+        self.codelet.update(user_id, string, order_number)
         self.codelet.unassign_editor()
-        self.order_number = order_number
         self.parent.canvas.redraw()
         return
 
@@ -92,6 +90,7 @@ class CodeBox:
         self.id = canvas.create_text(x_pos + self.padx, y_pos + self.pady, 
             anchor=Tk.NW, 
             text=self.get_text(), 
+            #text="{} - {}".format(self.get_order_id(), self.get_text()), # debug
             width=canvas.get_width() - (self.padx * 2), 
             tags=self.text_tag(),
             font=self.root.font,
@@ -141,7 +140,6 @@ class CodeBox:
 
     def on_enter(self, event=None): # could use this instead of active colour?
         # if not currently editing
-
         if not self.root.disable_codelet_highlight():
             self.highlight()
             self.root.root.config(cursor=self.root.get_active_cursor_icon())
@@ -157,7 +155,7 @@ class CodeBox:
         return
 
     def get_order_id(self):
-        return self.order_number
+        return self.codelet.get_order_id()
 
     def evaluate_history(self):
         """ Iterates over each item in the codelet's history and evaluates it """
@@ -201,6 +199,9 @@ class CodeBox:
 
     def has_error(self):
         return  self.codelet.has_error()
+
+    def is_visible(self):
+        return (not self.is_hidden() or self.parent.canvas._switch_view_hidden is True)
 
     def is_hidden(self):
         return self.codelet.is_hidden()

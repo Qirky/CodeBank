@@ -80,11 +80,11 @@ class ServerApp(BasicApp):
 
         if codelet is not None:
 
-            codelet.update(user_id, string, self.sharedspace.next_order_id())
+            codelet.update(user_id, string, self.socket.next_order_id())
 
         else:
 
-            codelet = Codelet(self.socket.next_codelet_id(), user_id, string)
+            codelet = Codelet(self.socket.next_codelet_id(), user_id, string, self.socket.next_order_id())
 
             self.sharedspace.add_codelet(codelet)
 
@@ -98,7 +98,7 @@ class ServerApp(BasicApp):
 
         # Send back to clients
 
-        self.socket.send_to_all(MESSAGE_UPDATE(user_id, codelet.get_id(), string, self.sharedspace.get_order_id()))
+        self.socket.send_to_all(MESSAGE_UPDATE(user_id, codelet.get_id(), string, codelet.get_order_id()))
 
         return
 

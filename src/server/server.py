@@ -47,7 +47,7 @@ class Server(ThreadedServer):
 
         # Keep track of all the connected clients
 
-        #self.__order_id    = 0
+        self.__order_id    = 0
         self.__codelet_id  = 0
         self.__client_id   = 0
         self.clients       = [] # Client objects
@@ -98,6 +98,10 @@ class Server(ThreadedServer):
     def next_codelet_id(self):
         self.__codelet_id += 1
         return self.__codelet_id
+
+    def next_order_id(self):
+        self.__order_id += 1
+        return self.__order_id
 
     def add_new_client(self, address, socket, name):
         """ """

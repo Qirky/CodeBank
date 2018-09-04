@@ -1,5 +1,5 @@
 class Codelet:
-    def __init__(self, id_num, user_id, string):
+    def __init__(self, id_num, user_id, string, order_id=0):
         # Unique identifier
         self.id = id_num
         # A list of tuples; User & Code
@@ -10,14 +10,18 @@ class Codelet:
         self.hidden = False
         self.highlighted = False
         
-        self.update(user_id, string)
+        self.update(user_id, string, order_id)
 
-    def update(self, user_id, string):
+    def update(self, user_id, string, order_id):
         """ Updates the contents of the codelet text - only changes the user if the string has been changed """
-        self.un_hide()
+        if self.is_hidden():
+            self.order_id = order_id
+            self.un_hide()
+
         if string != self.get_text():
             self.history.append((user_id, string))
             self.error = False
+            self.order_id = order_id # might already be done if was hidden?
         return
 
     def rollback(self, n=1):
@@ -39,6 +43,9 @@ class Codelet:
 
     def get_user_id(self):
         return self.history[-1][0]
+
+    def get_order_id(self):
+        return self.order_id
 
     def get_editor(self):
         return self.editor
