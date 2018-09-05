@@ -64,6 +64,8 @@ class BasicApp:
         self.codelet_on_click = lambda *args, **kwargs: None
         self.disable_codelet_highlight = lambda *args, **kwargs: True
 
+        self._mouse_in_codebox_flag = False
+
         # FoxDot interpreter
 
         self.lang = lang
@@ -166,3 +168,11 @@ class BasicApp:
 
     def get_active_cursor_icon(self):
         return ""
+
+    def mouse_in_codebox(self):
+        """ Returns True if the mouse is on a codebox """
+        return self._mouse_in_codebox_flag
+
+    def set_mouse_in_codebox(self, active):
+        self.root._mouse_in_codebox_flag = bool(active)
+        return

@@ -520,6 +520,7 @@ class App(BasicApp):
                     codebox = codeboxes[0]
             self.highlight_codelet(codebox.codelet.id)
             self.sharedspace.canvas.redraw()
+            self.set_mouse_in_codebox(False)
         else:
             return "break"
 
@@ -540,5 +541,6 @@ class App(BasicApp):
                     codebox = this_codebox
             self.highlight_codelet(codebox.codelet.id)
             self.sharedspace.canvas.redraw()
+            self.set_mouse_in_codebox(False)
         else:
             return "break"

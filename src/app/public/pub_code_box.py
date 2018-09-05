@@ -145,6 +145,7 @@ class CodeBox:
             self.root.root.config(cursor=self.root.get_active_cursor_icon())
         else:
             self.root.root.config(cursor=self.root.get_cursor_icon())
+        self.root.set_mouse_in_codebox(True)
         return
 
     def on_leave(self, event=None):
@@ -152,6 +153,7 @@ class CodeBox:
         if not self.root.disable_codelet_highlight():
             self.de_highlight()
         self.root.root.config(cursor=self.root.get_cursor_icon())
+        self.root.set_mouse_in_codebox(False)
         return
 
     def get_order_id(self):

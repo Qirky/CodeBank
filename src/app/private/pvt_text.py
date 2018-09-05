@@ -7,8 +7,8 @@ class TextInput(Tk.Text):
     """docstring for TextInput"""
     def __init__(self, parent, *args, **kwargs):
         Tk.Text.__init__(self, parent, *args, **kwargs)
-        self.parent = parent
-        self.root   = self.parent.parent
+        self.parent = parent # pvt_main
+        self.root   = self.parent.parent # client_app
 
         self.lang   = self.root.lang
         self.lang_format = self.lang.Workspace.Format
@@ -87,7 +87,7 @@ class TextInput(Tk.Text):
 
     def return_key(self, event=None):
         """ If a codelet is highlighted, use PULL, if not, just use the return Key"""
-        if self.root.highlighted_codelet != NULL:
+        if self.root.highlighted_codelet != NULL and (not self.root.mouse_in_codebox()):
             self.root.request_codelet(self.root.highlighted_codelet)
             self.root.unhighlight_all_codelets()
             return "break"
