@@ -145,6 +145,9 @@ class BasicApp:
         self.sharedspace.peer_box.add_user(user_id, name)
         return
 
+    def get_user_name(self, user_id):
+        return self.socket.users[user_id]
+
     def remove_user(self, user_id):
         del self.socket.users[user_id]
         self.sharedspace.peer_box.remove_user(user_id)

@@ -439,9 +439,9 @@ class App(BasicApp):
 
     def hide_codelet(self, user_id, codelet_id):
         """ Labels the codelet as hidden """
-        print("Hiding codelet num. {}".format(codelet_id))
-        self.get_codelet(codelet_id).hide()        
+        self.get_codelet(codelet_id).hide()
         self.sharedspace.redraw()
+        print("User '{}' hiding codelet id. {}".format(self.get_user_name(user_id), codelet_id))
         return
 
     def rollback(self, user_id, codelet_id):

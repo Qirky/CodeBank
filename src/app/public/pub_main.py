@@ -32,20 +32,11 @@ class SharedSpace(Tk.Frame):
         # Codelet / codebox information
 
         self.codelets = {}
-        # self.order_number = 0
 
     def add_codelet(self, codelet):
         """ Adds a new codelet to the canvas wrapped in a CodeBox instance """
         self.codelets[codelet.id] = CodeBox(self, codelet)
-        # self.order_number += 1
         return
-
-    # def next_order_id(self):
-    #     self.order_number += 1
-    #     return self.order_number
-
-    # def get_order_id(self):
-    #     return self.order_number
 
     def redraw(self):
         self.canvas.redraw()
