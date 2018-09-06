@@ -11,6 +11,9 @@ class MenuBar(Tk.Menu):
 
         filemenu =  Tk.Menu(self, tearoff=0)
         filemenu.add_command(label="Connect to server", command=self.parent.init_connection)
-        filemenu.add_command(label="Increase font size", command=self.parent.increase_font_size, accelerator="Ctrl+=")
-        filemenu.add_command(label="Decrease font size", command=self.parent.decrease_font_size, accelerator="Ctrl=-")
         self.add_cascade(label="File", menu=filemenu)        
+
+        editmenu = Tk.Menu(self, tearoff=0)
+        editmenu.add_command(label="Increase font size", command=self.parent.increase_font_size, accelerator="Ctrl+=")
+        editmenu.add_command(label="Decrease font size", command=self.parent.decrease_font_size, accelerator="Ctrl=-")
+        self.add_cascade(label="Edit",  menu=editmenu)
