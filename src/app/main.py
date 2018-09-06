@@ -155,7 +155,7 @@ class BasicApp:
 
     def increase_font_size(self, event=None):
         font = tkFont.nametofont("CodeFont")
-        size = font.actual()["size"]+2
+        size = min(font.actual()["size"]+2, 28)
         font.configure(size=size)
         return "break"
 

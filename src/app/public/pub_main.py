@@ -29,6 +29,9 @@ class SharedSpace(Tk.Frame):
         self.peer_box = PeerBox(self)
         self.peer_box.grid(row=0, column=1, sticky=Tk.NSEW)
 
+        self.grid_columnconfigure(0, weight=0)
+        self.grid_columnconfigure(1, weight=0)
+
         # Codelet / codebox information
 
         self.codelets = {}

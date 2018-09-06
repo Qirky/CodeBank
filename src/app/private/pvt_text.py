@@ -5,13 +5,14 @@ from ...utils import CONTROL_KEY, NULL
 
 class TextInput(Tk.Text):
     """docstring for TextInput"""
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, main, *args, **kwargs):
         Tk.Text.__init__(self, parent, *args, **kwargs)
-        self.parent = parent # pvt_main
+        self.parent = main # pvt_main
         self.root   = self.parent.parent # client_app
 
         self.lang   = self.root.lang
         self.lang_format = self.lang.Workspace.Format
+        self.config(height=10, width=80) # hacky
 
         # Set some custom colours
 

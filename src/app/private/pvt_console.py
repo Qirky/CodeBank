@@ -6,7 +6,7 @@ class Console(Tk.Text):
     """docstring for TextInput"""
     def __init__(self, *args, **kwargs):
         Tk.Text.__init__(self, *args, **kwargs)
-        self.config(bg="black", width=50, height=10)
+        self.config(bg="black", height=10) # w = 50
         self.tag_config("console", foreground="white")
         self.disable()
 

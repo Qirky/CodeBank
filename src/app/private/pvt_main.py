@@ -36,14 +36,20 @@ class Workspace(Tk.Frame):
 
         # Textbox
 
-        self.text = TextInput(self, height=10, font=self.parent.font)
-        self.text.grid(row=1, column=0, sticky=Tk.NSEW)
+        self.container = Tk.Frame(self, height=250, width=0)
+        self.container.grid(row=1, column=0, sticky=Tk.NSEW)
+        self.container.grid_propagate(False)
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
 
-        self.text.bind("<{}-Return>".format(CONTROL_KEY), self.evaluate_code_locally)
+        self.text = TextInput(self.container, main=self, font=self.parent.font)
+        self.text.grid(row=0, column=0, sticky=Tk.NSEW)
+
+        self.text.bind("<{}-Return>".format(CONTROL_KEY),       self.evaluate_code_locally)
         self.text.bind("<{}-Shift-Return>".format(CONTROL_KEY), self.push_code_to_remote)
 
-        # self.text.bind("<{}-equal>".format(CONTROL_KEY), self.parent.increase_font_size)
-        # self.text.bind("<{}-minus>".format(CONTROL_KEY), self.parent.decrease_font_size)
+        self.text.bind("<{}-equal>".format(CONTROL_KEY), self.parent.increase_font_size)
+        self.text.bind("<{}-minus>".format(CONTROL_KEY), self.parent.decrease_font_size)
 
         # Canvas bindings
 
@@ -52,8 +58,14 @@ class Workspace(Tk.Frame):
 
         # Console
 
-        self.console = Console(self, font=self.parent.font)
-        self.console.grid(row=1, column=1, sticky=Tk.NSEW)
+        self.c_container = Tk.Frame(self)
+        self.c_container.grid(row=1, column=1, sticky=Tk.NSEW)
+        self.c_container.grid_propagate(False)
+        self.c_container.grid_rowconfigure(0, weight=1)
+        self.c_container.grid_columnconfigure(0, weight=1)
+
+        self.console = Console(self.c_container, font=self.parent.font)
+        self.console.grid(row=0, column=0, sticky=Tk.NSEW)
 
         sys.stdout = self.console # routes stdout to print to console
 

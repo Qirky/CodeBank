@@ -18,7 +18,9 @@ class PeerBox(Tk.Frame):
         self.listbox.bind("<Button-1>", lambda e: "break")
         self.listbox.bind("<B1-Motion>", lambda e: "break")
 
-        Tk.Grid.rowconfigure(self, 0, weight=1) # Expans
+        Tk.Grid.rowconfigure(self, 0, weight=1) # Expand
+        
+        # Tk.Grid.columnconfigure(self, 0, weight=1) # Expand
 
         self.users = {}    
 
