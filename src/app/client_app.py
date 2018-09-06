@@ -34,19 +34,20 @@ class App(BasicApp):
         # Data handlers to handle messages from the server
 
         self.handlers = {
-            HANDLE_KILL    : self.kill,
-            HANDLE_UPDATE  : self.recv_codelet,
-            HANDLE_HIDE    : self.hide_codelet,
-            HANDLE_LOAD    : self.load_codelet,
-            HANDLE_DISABLE : self.disable_codelet,
-            HANDLE_UNDO    : self.rollback,
-            HANDLE_NAME    : self.add_user,
-            HANDLE_SET_ID  : self.set_user_id,
-            HANDLE_RELEASE : self.release_codelet,
-            HANDLE_ERROR   : self.raise_error,
-            HANDLE_INFO    : self.print_msg,
-            HANDLE_REMOVE  : self.remove_user,
-            HANDLE_HISTORY : self.load_codelet_history,
+            HANDLE_KILL     : self.kill,
+            HANDLE_UPDATE   : self.recv_codelet,
+            HANDLE_HIDE     : self.hide_codelet,
+            HANDLE_LOAD     : self.load_codelet,
+            HANDLE_DISABLE  : self.disable_codelet,
+            HANDLE_UNDO     : self.rollback,
+            HANDLE_NAME     : self.add_user,
+            HANDLE_SET_ID   : self.set_user_id,
+            HANDLE_RELEASE  : self.release_codelet,
+            HANDLE_ERROR    : self.raise_error,
+            HANDLE_INFO     : self.print_msg,
+            HANDLE_REMOVE   : self.remove_user,
+            HANDLE_HISTORY  : self.load_codelet_history,
+            HANDLE_SHUTDOWN : self.shutdown_from_server,
         }
 
         # This stores the codelet being currently edited
@@ -411,6 +412,12 @@ class App(BasicApp):
 
     def disable_codelet(self, user_id, codelet_id):
         """ Flags a codelet to be disabled i.e. cannot be loaded """
+        return
+
+    def shutdown_from_server(self, *args, **kwargs):
+        """ If the server has been shutdown, disable the interface """
+        print("ConnectionError - connection to server lost")
+        self.disable()
         return
 
     def recv_codelet(self, user_id, code_id, string, order_id):

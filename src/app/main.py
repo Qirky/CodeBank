@@ -57,7 +57,6 @@ class BasicApp:
         # Top canvas box for containing code blocks
         self.sharedspace = SharedSpace(self)
         self.sharedspace.grid(row=0, column=0)
-        # self.sharedspace.grid_propagate(False)
 
         # Action for on-click of codelets
 
@@ -149,8 +148,9 @@ class BasicApp:
         return self.socket.users[user_id]
 
     def remove_user(self, user_id):
-        del self.socket.users[user_id]
-        self.sharedspace.peer_box.remove_user(user_id)
+        if user_id in self.socket.users:
+            del self.socket.users[user_id]
+            self.sharedspace.peer_box.remove_user(user_id)
         return
 
     def increase_font_size(self, event=None):

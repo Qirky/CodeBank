@@ -24,22 +24,23 @@ CONTROL_KEY = "Command" if SYSTEM == MAC_OS else "Control"
 
 # Handler codes
 
-HANDLE_KILL    = 0
-HANDLE_PUSH    = 1
-HANDLE_DELETE  = 2
-HANDLE_LOAD    = 3
-HANDLE_DISABLE = 4
-HANDLE_UNDO    = 5
-HANDLE_NAME    = 6
-HANDLE_REQUEST = 7
-HANDLE_SET_ID  = 8
-HANDLE_RELEASE = 9
-HANDLE_UPDATE  = 10
-HANDLE_ERROR   = 11
-HANDLE_INFO    = 12
-HANDLE_REMOVE  = 13
-HANDLE_HISTORY = 14
-HANDLE_HIDE    = 15
+HANDLE_KILL     = 0
+HANDLE_PUSH     = 1
+HANDLE_DELETE   = 2
+HANDLE_LOAD     = 3
+HANDLE_DISABLE  = 4
+HANDLE_UNDO     = 5
+HANDLE_NAME     = 6
+HANDLE_REQUEST  = 7
+HANDLE_SET_ID   = 8
+HANDLE_RELEASE  = 9
+HANDLE_UPDATE   = 10
+HANDLE_ERROR    = 11
+HANDLE_INFO     = 12
+HANDLE_REMOVE   = 13
+HANDLE_HISTORY  = 14
+HANDLE_HIDE     = 15
+HANDLE_SHUTDOWN = 16
 
 def MESSAGE_KILL(user_id):
     return [HANDLE_KILL, user_id]
@@ -79,6 +80,9 @@ def MESSAGE_UNDO(user_id, codelet_id):
 
 def MESSAGE_HIDE(user_id, codelet_id):
     return [HANDLE_HIDE, user_id, codelet_id]
+
+def MESSAGE_SHUTDOWN(user_id=-1):
+    return [HANDLE_SHUTDOWN, user_id]
 
 # Special case codelet IDs
 

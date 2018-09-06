@@ -85,8 +85,20 @@ class Server(ThreadedServer):
 
     def kill(self):
         """ Properly terminates the server instance """
+        
+        # Stop running loop
+
         self.running = False
         self.app.lang.allow_connections(False)
+
+        self.send_to_all(MESSAGE_SHUTDOWN())
+
+        # Remove users
+        for user_id in list(self.users.keys()):
+
+            self.app.remove_user(user_id)
+
+        # Close server
         self.shutdown()
         self.server_close()
         return
