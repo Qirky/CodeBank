@@ -133,6 +133,11 @@ class BasicApp:
             self.evaluate(string)
         return
 
+    def update_random_seed(self, user_id=-1, seed=0):
+        """ Sets the seed for random number generators"""
+        self.evaluate("RandomGenerator.set_override_seed({})".format(seed), verbose=False)
+        return
+
     def get_codelets(self):
         """ Returns the list of code-box abstractions of the stored codelets  """
         return self.sharedspace.codelets.values()

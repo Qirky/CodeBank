@@ -71,6 +71,7 @@ class Server(ThreadedServer):
         import FoxDot
 
         self.app = ServerApp(self, FoxDot)
+        self.app.update_random_seed(seed=self.get_seed())
 
     def __str__(self):
         return "{} on port {}\n".format(self.hostname, self.port)
@@ -80,8 +81,7 @@ class Server(ThreadedServer):
 
         print("Server running @ {}".format(str(self)))
 
-        self.app.lang.allow_connections()
-        self.app.seed = self.get_seed()
+        self.app.lang.allow_connections()        
         self.running = True
         self.server_thread.start()
         self.app.run()

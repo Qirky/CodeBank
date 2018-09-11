@@ -481,11 +481,6 @@ class App(BasicApp):
         BasicApp.remove_user(self, user_id)
         return
 
-    def update_random_seed(self, user_id, seed):
-        """ Sets the seed for random number generators"""
-        self.lang.evaluate("RandomGenerator.set_override_seed({})".format(seed), verbose=False)
-        return
-
     def set_user_id(self, user_id):
         self.socket.user_id = user_id
         return
