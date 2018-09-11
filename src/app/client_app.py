@@ -477,15 +477,13 @@ class App(BasicApp):
         return
 
     def remove_user(self, user_id):
-        print("User  '{}' disconnected.".format(self.get_user_name(user_id)))
+        print("User  '{}' has disconnected.".format(self.get_user_name(user_id)))
         BasicApp.remove_user(self, user_id)
         return
 
     def update_random_seed(self, user_id, seed):
         """ Sets the seed for random number generators"""
-        #import random
-        #return random.seed(seed)
-        self.seed = seed
+        self.lang.evaluate("RandomGenerator.set_override_seed({})".format(seed), verbose=False)
         return
 
     def set_user_id(self, user_id):
