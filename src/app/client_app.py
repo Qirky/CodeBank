@@ -483,8 +483,10 @@ class App(BasicApp):
 
     def update_random_seed(self, user_id, seed):
         """ Sets the seed for random number generators"""
-        import random
-        return random.seed(seed)
+        #import random
+        #return random.seed(seed)
+        self.seed = seed
+        return
 
     def set_user_id(self, user_id):
         self.socket.user_id = user_id

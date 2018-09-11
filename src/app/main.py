@@ -8,6 +8,7 @@ from .public import SharedSpace
 from .private import Workspace
 
 import socket
+import random
 
 # This removed blurry fonts on Windows
 try:
@@ -68,6 +69,7 @@ class BasicApp:
         # FoxDot interpreter
 
         self.lang = lang
+        self.seed = 0
 
     def run(self):
         """ Starts the TKinter mainloop """
@@ -102,12 +104,19 @@ class BasicApp:
         
         return
 
+    def reset_random(self):
+        """ Re-seeds the RNG to a pre-specified value so all randomness is repeated across all connected machines """
+        random.seed(self.seed)
+        return
+
     def evaluate(self, code):
         """ Passes a string to FoxDot to exectute """
         
         if self.lang is not None:
 
-            return self.lang.execute(code)
+            self.reset_random()
+
+            self.lang.execute(code)
 
         return
 

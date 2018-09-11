@@ -272,7 +272,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Rest the seed
 
-        self.send_to_all( MESSAGE_SEED(seed=self.master.get_seed()) )
+        self.send( MESSAGE_SEED(seed=self.master.get_seed()) )
 
         # Grab current code
 
