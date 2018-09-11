@@ -48,6 +48,7 @@ class App(BasicApp):
             HANDLE_REMOVE   : self.remove_user,
             HANDLE_HISTORY  : self.load_codelet_history,
             HANDLE_SHUTDOWN : self.shutdown_from_server,
+            HANDLE_SEED     : self.update_random_seed,
         }
 
         # This stores the codelet being currently edited
@@ -475,6 +476,11 @@ class App(BasicApp):
 
         return
 
+    def update_random_seed(self, user_id, seed):
+        """ Sets the seed for random number generators"""
+        import random
+        return random.seed(seed)
+
     def set_user_id(self, user_id):
         self.socket.user_id = user_id
         return
@@ -504,7 +510,6 @@ class App(BasicApp):
             self.get_codelet(codelet_id).highlight()
             self.highlighted_codelet = codelet_id
         return
-
 
     def highlight_codelet_up(self, event=None):
         """ Called when the user uses Alt+Up to cycle through the  """

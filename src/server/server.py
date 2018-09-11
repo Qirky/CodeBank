@@ -8,6 +8,8 @@ except ImportError:
 import socket
 import json
 import sys
+import random
+
 from threading import Thread
 from time import sleep
 from getpass import getpass
@@ -50,6 +52,8 @@ class Server(ThreadedServer):
         self.__order_id    = 0
         self.__codelet_id  = 0
         self.__client_id   = 0
+        self.__seed        = random.randint(0, 2048) # Force all clients to use the same seed
+
         self.clients       = [] # Client objects
         self.users         = {} # ID: Name
 
@@ -114,6 +118,9 @@ class Server(ThreadedServer):
     def next_order_id(self):
         self.__order_id += 1
         return self.__order_id
+
+    def get_seed(self):
+        return self.__seed
 
     def add_new_client(self, address, socket, name):
         """ """
@@ -221,17 +228,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             print("new connection from {} - {}".format(*self.client_address))
 
-            # Send the user_id to the client
-
-            self.send([HANDLE_SET_ID, self.user_id])
-
-            # Notify other users
-
-            self.send_to_all( MESSAGE_NAME(self.user_id, self.name) )
-
-            # Grab current code
-
-            self.pull_all_code()
+            self.handle_new_connection()
 
         # Continually read from client until disconnected
 
@@ -261,6 +258,28 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         return
 
+    def handle_new_connection(self):
+        """ Called during a connection, updates connected clients with name information
+            and resets the seed for random number generation etc.  """
+
+        # Send the user_id to the client
+
+        self.send([HANDLE_SET_ID, self.user_id])
+
+        # Notify other users
+
+        self.send_to_all( MESSAGE_NAME(self.user_id, self.name) )
+
+        # Rest the seed
+
+        self.send_to_all( MESSAGE_SEED(seed=self.master.get_seed()) )
+
+        # Grab current code
+
+        self.pull_all_code()
+
+        return
+
     def pull_all_code(self):
         """ Sends all current codelet data to the client """
         # Get all the connected users
@@ -270,7 +289,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Get all the code
         for codelet in self.master.app.get_codelets():
-            # data = MESSAGE_UPDATE(codelet.get_user_id(), codelet.get_id(), codelet.get_text(), codelet.get_order_id())
             data = MESSAGE_HISTORY(-1, codelet.get_id(), codelet.get_history(), codelet.get_order_id())
             self.send(data)
         return
@@ -281,7 +299,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
         return
 
     def send_to_all(self, data):
-
         """ Forwards 'data' to all connected clients """
 
         for socket in self.master.connections():
