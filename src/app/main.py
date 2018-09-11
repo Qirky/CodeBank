@@ -104,12 +104,12 @@ class BasicApp:
         
         return
 
-    def evaluate(self, code):
+    def evaluate(self, code, verbose=True):
         """ Passes a string to FoxDot to exectute """
         
         if self.lang is not None:
 
-            return self.lang.execute(code)
+            return self.lang.execute(code, verbose=verbose)
 
         return
 
