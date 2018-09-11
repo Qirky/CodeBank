@@ -106,8 +106,7 @@ class BasicApp:
 
     def reset_random(self):
         """ Re-seeds the RNG to a pre-specified value so all randomness is repeated across all connected machines """
-        print("seeding to value {}".format(self.seed))
-        random.seed(self.seed)
+        self.lang.execute("random.seed({})".format(self.seed), verbose=False)
         return
 
     def evaluate(self, code):
