@@ -106,16 +106,16 @@ class Workspace(Tk.Frame):
     def evaluate_code_locally(self, event=None):
         """ Runs code in the text box immediately without pushing to the remote """
 
-        self.text.highlight()
-
         code = self.text.get_text()
+
+        self.text.highlight()
 
         self.parent.evaluate(code)
 
         return "break"
 
     def push_code_to_remote(self, event=None):
-        """ Clears the txt box and sends code to server """
+        """ Clears the text box and sends code to server """
 
         self.parent.push_code_to_remote()
 
