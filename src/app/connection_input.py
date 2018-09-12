@@ -36,7 +36,7 @@ class popup_window:
         port = 57890 ## TODO - get this from somewhere else
         name = self.name.get()
         password = self.password.get()
-        if name.strip() != "":
+        if name.strip() != "" and host.strip() != "":
             self.value = (host, port, name, password)
             self.top.destroy()
         return
