@@ -3,22 +3,23 @@ from __future__ import absolute_import, print_function
 from ...utils import GET_USER_COLOUR
 from ..tkimport import Tk
 
-class PeerBox(Tk.Frame):
+class PeerBox(Tk.Listbox):
     def __init__(self, parent, *args, **kwargs):
-        Tk.Frame.__init__(self, *args, **kwargs)
-        
-        self.parent = parent
 
+        self.parent = parent
+    
         # List
 
-        self.listbox = Tk.Listbox(self, width=20, bg="White", font=self.parent.parent.font)
+        Tk.Listbox.__init__(self, self.parent, width=20, bg="White", font=self.parent.parent.font)
+
+        # self.listbox = Tk.Listbox(self, width=20, bg="White", font=self.parent.parent.font)
         
-        self.listbox.grid(row=0, column=1, sticky=Tk.NSEW)
+        # self.listbox.grid(row=0, column=1, sticky=Tk.NSEW)
 
-        self.listbox.bind("<Button-1>", lambda e: "break")
-        self.listbox.bind("<B1-Motion>", lambda e: "break")
+        self.bind("<Button-1>", lambda e: "break")
+        self.bind("<B1-Motion>", lambda e: "break")
 
-        Tk.Grid.rowconfigure(self, 0, weight=1) # Expand
+        # Tk.Grid.rowconfigure(self, 0, weight=1) # Expand
         
         # Tk.Grid.columnconfigure(self, 0, weight=1) # Expand
 
@@ -27,15 +28,15 @@ class PeerBox(Tk.Frame):
     def refresh(self):
         """ Clears the user list and redraws  """
         
-        self.listbox.delete(0, Tk.END)
+        self.delete(0, Tk.END)
         
         i = 0
 
         for user_id, name in self.users.items():
             
-            self.listbox.insert(Tk.END, name)
+            self.insert(Tk.END, name)
 
-            self.listbox.itemconfig(i, {'bg': GET_USER_COLOUR(user_id)})
+            self.itemconfig(i, {'bg': GET_USER_COLOUR(user_id)})
 
             i += 1
 

@@ -27,8 +27,8 @@ class BasicApp:
         # General config e.g. title
         self.root.protocol("WM_DELETE_WINDOW", self.kill )
 
-        Tk.Grid.columnconfigure(self.root, 0, weight=1)
-        Tk.Grid.rowconfigure(self.root, 0, weight=1)
+        #Tk.Grid.columnconfigure(self.root, 0, weight=1)
+        #Tk.Grid.rowconfigure(self.root, 0, weight=1)
 
         self.default_font = 'Consolas'
 
@@ -57,9 +57,11 @@ class BasicApp:
 
         # Top canvas box for containing code blocks
         self.sharedspace = SharedSpace(self)
-        self.sharedspace.grid(row=0, column=0)
+        self.sharedspace.grid(row=0, column=0, sticky=Tk.NSEW)
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(0, weight=1)
 
-        # Action for on-click of codelets
+        # Action for on-click of codelets -- maybe put  in def disable
 
         self.codelet_on_click = lambda *args, **kwargs: None
         self.disable_codelet_highlight = lambda *args, **kwargs: True

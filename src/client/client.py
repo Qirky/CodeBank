@@ -35,9 +35,10 @@ class Client:
         """ Connects to the server instance """
 
         # Get details of remote
-        self.hostname = hostname
-        self.port     = int(port)
-        self.address  = (self.hostname, self.port)
+        self.hostname  = hostname
+        self.port      = int(port)
+        self.address   = (self.hostname, self.port)
+        self.user_name = username
 
         # Connect to remote
 

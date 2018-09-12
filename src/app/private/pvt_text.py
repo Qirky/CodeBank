@@ -12,7 +12,7 @@ class TextInput(Tk.Text):
 
         self.lang   = self.root.lang
         self.lang_format = self.lang.Workspace.Format
-        self.config(height=10, width=80) # hacky
+        self.config(height=10, width=100)
 
         # Set some custom colours
 

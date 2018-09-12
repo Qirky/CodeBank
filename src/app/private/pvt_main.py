@@ -27,23 +27,11 @@ class Workspace(Tk.Frame):
             }
         )
 
-        # Make sure widgets expand
-        Tk.Grid.columnconfigure(self, 0, weight=1)
-        Tk.Grid.columnconfigure(self, 1, weight=1)
-        Tk.Grid.rowconfigure(self, 1, weight=1)
-
-        self.commands.grid(row=0, column=0, sticky=Tk.W)
-
         # Textbox
 
         self.container = Tk.Frame(self, height=250, width=0)
-        self.container.grid(row=1, column=0, sticky=Tk.NSEW)
-        self.container.grid_propagate(False)
-        self.container.grid_rowconfigure(0, weight=1)
-        self.container.grid_columnconfigure(0, weight=1)
 
         self.text = TextInput(self.container, main=self, font=self.parent.font)
-        self.text.grid(row=0, column=0, sticky=Tk.NSEW)
 
         self.text.bind("<{}-Return>".format(CONTROL_KEY),       self.evaluate_code_locally)
         self.text.bind("<{}-Shift-Return>".format(CONTROL_KEY), self.push_code_to_remote)
@@ -58,24 +46,44 @@ class Workspace(Tk.Frame):
 
         # Console
 
-        self.c_container = Tk.Frame(self)
-        self.c_container.grid(row=1, column=1, sticky=Tk.NSEW)
-        self.c_container.grid_propagate(False)
-        self.c_container.grid_rowconfigure(0, weight=1)
-        self.c_container.grid_columnconfigure(0, weight=1)
-
+        self.c_container = Tk.Frame(self, bg="gray")
         self.console = Console(self.c_container, font=self.parent.font)
-        self.console.grid(row=0, column=0, sticky=Tk.NSEW)
 
         sys.stdout = self.console # routes stdout to print to console
 
-        self.y_scroll = Tk.Scrollbar(self.parent.root)
+        self.y_scroll = Tk.Scrollbar(self)
         self.y_scroll.config(command=self.console.yview, orient=Tk.VERTICAL)
-        self.y_scroll.grid(row=2, column=2, sticky=Tk.NSEW)
 
         self.console.config(
             yscrollcommand=self.y_scroll.set,
             )
+
+        # Grid
+
+        # Make sure widgets expand
+
+        self.commands.grid(row=0, column=0, sticky=Tk.NSEW, columnspan=2)
+        self.y_scroll.grid(row=0, column=2, sticky=Tk.NSEW, rowspan=2)
+        
+        self.grid_rowconfigure(0, weight=0) # buttons
+        self.grid_rowconfigure(1, weight=1) # text
+        
+        self.grid_columnconfigure(0, weight=1) # text
+        self.grid_columnconfigure(1, weight=1) # console
+        self.grid_columnconfigure(2, weight=0)
+        
+        self.container.grid(row=1, column=0, sticky=Tk.NSEW)
+        self.container.grid_propagate(False)
+        self.text.grid(row=0, column=0, sticky=Tk.NSEW)
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
+
+        self.c_container.grid(row=1, column=1, sticky=Tk.NSEW)
+        self.c_container.grid_propagate(False)        
+        self.console.grid(row=0, column=0, sticky=Tk.NSEW)
+        self.c_container.grid_rowconfigure(0, weight=1)
+        self.c_container.grid_columnconfigure(0, weight=1)
+        
 
         # Placeholders for sending data to/from the server
 

@@ -4,8 +4,8 @@ from ..tkimport import Tk
 
 class SharedCanvas(Tk.Canvas):
     def __init__(self, parent, *args, **kwargs):
-        Tk.Canvas.__init__(self, *args, **kwargs)
         self.parent = parent
+        Tk.Canvas.__init__(self, self.parent, **kwargs)
         self._switch_view_hidden = False
         self.codeboxes = []
         self.padx = 10

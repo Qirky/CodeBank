@@ -11,8 +11,6 @@ class App(BasicApp):
         
         BasicApp.__init__(self, *args, **kwargs)
 
-        self.root.title("CodeBank Client: Not Connected")
-
         try:
 
             self.root.state("zoomed")
@@ -29,7 +27,8 @@ class App(BasicApp):
         # Lower text box for client text entry
 
         self.workspace = Workspace(self)
-        self.workspace.grid(row=2, column=0, sticky=Tk.NSEW, columnspan=2)
+        self.workspace.grid(row=1, column=0, sticky=Tk.NSEW)
+        self.root.grid_rowconfigure(1, weight=0) # make sure workspace expands
 
         # Data handlers to handle messages from the server
 
@@ -58,11 +57,6 @@ class App(BasicApp):
 
         self.sharedspace.canvas.bind("<Enter>", self.unhighlight_all_codelets)
         self.sharedspace.canvas.bind("<Leave>", self.unhighlight_all_codelets)
-
-        # Override calls 
-
-        # self.codelet_on_click = self.request_codelet
-        # self.disable_codelet_highlight = self.is_editing_codelet
 
         # Booleans
 
@@ -112,6 +106,7 @@ class App(BasicApp):
         """ Stop textbox and buttons from being used """
         self._is_enabled = False
         self.workspace.text.config(state=Tk.DISABLED, bg="#b3b3b3")
+        self.root.title("CodeBank Client: Not Connected")
         # Dissalow codelets to be highlighted
         self.codelet_on_click = lambda *args, **kwargs: None
         self.disable_codelet_highlight = lambda *args, **kwargs: True
@@ -121,6 +116,7 @@ class App(BasicApp):
         """ Allows textbox and buttons being used """ # 
         self._is_enabled = True
         self.workspace.text.config(state=Tk.NORMAL, bg="white")
+        self.root.title("CodeBank Client. Logged in as {}".format(self.get_client_name()))
         # Allow clicking
         self.codelet_on_click = self.request_codelet
         self.disable_codelet_highlight = self.is_editing_codelet
@@ -153,6 +149,10 @@ class App(BasicApp):
     def get_user_id(self):
         """ Returns the local user's id """
         return self.socket.user_id
+
+    def get_client_name(self):
+        """ Returns the user name for this client"""
+        return self.socket.user_name
 
     def get_cursor_icon(self):
         """ Returns the Tkinter string name for the icon that the cursor should be displaying"""
@@ -476,9 +476,9 @@ class App(BasicApp):
         
         # Update the UI
         
-        if self.my_id(user_id):
+        # if self.my_id(user_id):
         
-            self.root.title("CodeBank Client. Logged in as {}".format(name))
+        #     self.root.title("CodeBank Client. Logged in as {}".format(name))
 
         return
 
