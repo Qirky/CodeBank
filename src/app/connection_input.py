@@ -36,8 +36,10 @@ class popup_window:
         port = 57890 ## TODO - get this from somewhere else
         name = self.name.get()
         password = self.password.get()
-        self.value = (host, port, name, password)
-        self.top.destroy()
+        if name.strip() != "":
+            self.value = (host, port, name, password)
+            self.top.destroy()
+        return
 
     def center(self):
         """ Centers the popup in the middle of the screen """
