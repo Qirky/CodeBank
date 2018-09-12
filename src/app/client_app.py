@@ -61,8 +61,8 @@ class App(BasicApp):
 
         # Override calls 
 
-        self.codelet_on_click = self.request_codelet
-        self.disable_codelet_highlight = self.is_editing_codelet
+        # self.codelet_on_click = self.request_codelet
+        # self.disable_codelet_highlight = self.is_editing_codelet
 
         # Booleans
 
@@ -112,12 +112,18 @@ class App(BasicApp):
         """ Stop textbox and buttons from being used """
         self._is_enabled = False
         self.workspace.text.config(state=Tk.DISABLED, bg="#b3b3b3")
+        # Dissalow codelets to be highlighted
+        self.codelet_on_click = lambda *args, **kwargs: None
+        self.disable_codelet_highlight = lambda *args, **kwargs: True
         return
 
     def enable(self):
         """ Allows textbox and buttons being used """ # 
         self._is_enabled = True
         self.workspace.text.config(state=Tk.NORMAL, bg="white")
+        # Allow clicking
+        self.codelet_on_click = self.request_codelet
+        self.disable_codelet_highlight = self.is_editing_codelet
         return
 
     def clear(self):
