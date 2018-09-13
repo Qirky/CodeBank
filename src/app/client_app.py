@@ -29,6 +29,7 @@ class App(BasicApp):
         self.workspace = Workspace(self)
         self.workspace.grid(row=1, column=0, sticky=Tk.NSEW)
         self.root.grid_rowconfigure(1, weight=0) # make sure workspace expands
+        self.text = self.workspace.text # Give the app a direct reference to text
 
         # Data handlers to handle messages from the server
 

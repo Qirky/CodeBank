@@ -45,6 +45,7 @@ class SharedSpace(Tk.Frame):
         self.canvas.grid(row=0, column=0, sticky=Tk.NSEW)
         self.drag.grid(row=0, column=1, sticky=Tk.NSEW)
         self.peer_box.grid(row=0, column=2, sticky=Tk.NSEW)
+        self.peer_box.grid_propagate(False)
         self.y_scroll.grid(row=0, column=3, sticky=Tk.NSEW)
 
         # Codelet / codebox information
@@ -60,36 +61,30 @@ class SharedSpace(Tk.Frame):
         self.canvas.redraw()
 
     def drag_mouseclick(self, event=None):
+        """ Flags the mouse as clicked for drag action """
         self.drag_mouse_down = True
         self.grid_propagate(False)
         return
 
     def drag_mouserelease(self, event=None):
+        """ Flags the mouse has been released and gives focus to the app.text if it exists """
         self.drag_mouse_down = False
-        # self.app.text.focus_set()
+        
+        if self.parent.text is not None:
+        
+            self.parent.text.focus_set()
+        
         return
 
     def drag_mousedrag(self, event=None):
+        """ Resizes the canvas and listbox """
 
         if self.drag_mouse_down:
-            
-            #line_height = self.peer_box.listbox.dlineinfo("@0,0")
 
-            #print(line_height)
+            delta = (self.drag.winfo_rootx() - event.x_root)
 
-            # if textbox_line_h is not None:
-
-            #     self.app.text.height = int(self.app.text.winfo_height() / textbox_line_h[3])
-                
-            # self.root_h = self.height + self.app.text.height
-
-            # widget_y = self.canvas.winfo_rooty()
-
-            # new_height = (self.canvas.winfo_height() + (widget_y - event.y_root) )
-
-            # self.height, old_height = new_height, self.height
-
-            # self.canvas.config(height = max(self.height, 50))
+            self.peer_box.config(width=self.peer_box.winfo_width() + delta)
+            self.canvas.config(width=self.canvas.winfo_width() - delta)
 
             return "break"
 

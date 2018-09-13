@@ -20,6 +20,7 @@ except:
 # Baseclass
 
 class BasicApp:
+    text = None
 
     def __init__(self, client, lang):
         self.root=Tk.Tk()
@@ -27,8 +28,6 @@ class BasicApp:
         # General config e.g. title
         self.root.protocol("WM_DELETE_WINDOW", self.kill )
 
-        #Tk.Grid.columnconfigure(self.root, 0, weight=1)
-        #Tk.Grid.rowconfigure(self.root, 0, weight=1)
 
         self.default_font = 'Consolas'
 
