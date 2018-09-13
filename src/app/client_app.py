@@ -59,10 +59,14 @@ class App(BasicApp):
         self.sharedspace.canvas.bind("<Enter>", self.unhighlight_all_codelets)
         self.sharedspace.canvas.bind("<Leave>", self.unhighlight_all_codelets)
 
-        # Booleans
+        # Boolean flags
 
         self.solo_on = False
         self.selecting_codelet_to_hide = False
+
+        # Banned local commands
+
+        self.banned_commands = [re.compile(r".*(Clock.bpm\s*[\+\-\*\/]*\s*=\s*.+)")]
 
         # Don't allow users to use buttons / text box until connected
 
@@ -238,6 +242,16 @@ class App(BasicApp):
                     cmd = "{}.solo({})".format(players[0], int(self.solo_on))
                 self.evaluate(cmd)
         return
+
+    def check_valid_command(self, string):
+        """ Returns a list of code chunks that are not allowed to be run on a local version """
+        banned = []
+        for line in string.split("\n"):
+            for phrase in self.banned_commands:
+                match = phrase.match(line)
+                if match is not None:
+                    banned.append(match.group(1))
+        return banned
 
     def reset_program_state(self, event=None):
         """ Resets the program state to before the last push, triggered by the RESET button """

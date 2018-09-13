@@ -118,7 +118,21 @@ class Workspace(Tk.Frame):
 
         self.text.highlight()
 
-        self.parent.evaluate(code)
+        banned_code = self.parent.check_valid_command(code)
+
+        if len(banned_code) == 0:
+
+            self.parent.evaluate(code)
+
+        else:
+
+            # Alert user
+
+            print("Error: cannot evaluate the on local working version:")
+            
+            for command in banned_code:
+            
+                print("\t{!r}".format(command))
 
         return "break"
 
