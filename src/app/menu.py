@@ -16,4 +16,5 @@ class MenuBar(Tk.Menu):
         editmenu = Tk.Menu(self, tearoff=0)
         editmenu.add_command(label="Increase font size", command=self.parent.increase_font_size, accelerator="Ctrl+=")
         editmenu.add_command(label="Decrease font size", command=self.parent.decrease_font_size, accelerator="Ctrl=-")
+        editmenu.add_command(label="Hide all codelets",  command=self.parent.hide_all_codelets)
         self.add_cascade(label="Edit",  menu=editmenu)

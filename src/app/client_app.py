@@ -366,6 +366,16 @@ class App(BasicApp):
 
         return
 
+    def hide_all_codelets(self, event=None):
+        """ Sends messages for hiding all codelets that are not being edited """
+        for codelet_id, codelet in self.sharedspace.codelets.items():
+
+            if codelet.is_being_edited() is False:
+
+                self.send_hide_codelet(codelet_id)
+
+        return
+
     def clear_clock(self,  event=None):
         """ Sends a new message to the server to clear the scheduling clock """
         if self._is_enabled:
