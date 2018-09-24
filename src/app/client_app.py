@@ -66,7 +66,7 @@ class App(BasicApp):
 
         # Banned local commands
 
-        self.banned_commands = [re.compile(r".*(Clock.bpm\s*[\+\-\*\/]*\s*=\s*.+)")]
+        self.banned_commands = [re.compile(r".*(Clock\s*\.\s*bpm\s*[\+\-\*\/]*\s*=\s*.+)"), re.compile(r".*(Clock\s*\.\s*clear\(\s*\))")]
 
         # Don't allow users to use buttons / text box until connected
 
