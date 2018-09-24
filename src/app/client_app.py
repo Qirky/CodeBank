@@ -353,16 +353,20 @@ class App(BasicApp):
 
     def send_hide_codelet(self, codelet_id):
         """ Sends a message to the server to hide a codelet from view """
+
+        # Only send if the codelet is not already hidden
+
+        if self.sharedspace.codelets[codelet_id].is_hidden() is False:
         
-        data = MESSAGE_HIDE(self.get_user_id(), codelet_id)
+            data = MESSAGE_HIDE(self.get_user_id(), codelet_id)
 
-        if self.socket.is_connected():
+            if self.socket.is_connected():
 
-            self.socket.send(data)
+                self.socket.send(data)
 
-        if self.selecting_codelet_to_hide:
+            if self.selecting_codelet_to_hide:
 
-            self.toggle_selecting_codelet_to_hide()
+                self.toggle_selecting_codelet_to_hide()
 
         return
 
@@ -424,21 +428,30 @@ class App(BasicApp):
 
         return
 
-    def load_codelet_history(self, user_id, codelet_id, data, order_id ):
+    def load_codelet_history(self, user_id, codelet_id, data, order_id, is_hidden ):
         """ Only called when connecting to a server: creates codelets and
             runs the most recent item in the code. """
 
-        user_id, string = data[0]
+        user_id, string = data[0] # editor of the code, user_id argument is likely -1
 
         codelet = Codelet(codelet_id, user_id, string)
 
-        codelet.load_history(data)
-
         self.sharedspace.add_codelet(codelet)
 
-        # Evaluate the code
+        codelet.load_history(data)
 
-        self.evaluate_codelet(codelet)
+        if is_hidden:
+
+            # Hide the codelet if flagged
+
+            codelet.hide()
+            self.sharedspace.redraw()
+
+        else:
+
+            # Evaluate the code
+
+            self.evaluate_codelet(codelet)
 
         return
 

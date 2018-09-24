@@ -298,8 +298,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Get all the code
         for codelet in self.master.app.get_codelets():
-            data = MESSAGE_HISTORY(-1, codelet.get_id(), codelet.get_history(), codelet.get_order_id())
+            data = MESSAGE_HISTORY(-1, codelet.get_id(), codelet.get_history(), codelet.get_order_id(), codelet.is_hidden())
             self.send(data)
+
         return
 
     def send(self, data):

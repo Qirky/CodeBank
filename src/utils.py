@@ -73,8 +73,8 @@ def MESSAGE_INFO(user_id, string):
 def MESSAGE_REMOVE(user_id):
     return [HANDLE_REMOVE, user_id]
 
-def MESSAGE_HISTORY(user_id, codelet_id, data, order_id):
-    return [HANDLE_HISTORY, user_id, codelet_id, data, order_id]
+def MESSAGE_HISTORY(user_id, codelet_id, data, order_id, hidden=0):
+    return [HANDLE_HISTORY, user_id, codelet_id, data, order_id, int(hidden)]
 
 def MESSAGE_UNDO(user_id, codelet_id):
     return [HANDLE_UNDO, user_id, codelet_id]
