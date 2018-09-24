@@ -16,15 +16,15 @@ class Workspace(Tk.Frame):
 
         # Buttons
 
-        self.commands = CommandButtons(self, commands={
-                "PUSH"          : self.parent.push_code_to_remote,
-                "SOLO"          : self.parent.solo_local_code,
-                "RESET"         : self.parent.reset_program_state,
-                "ROLLBACK"      : self.parent.trigger_rollback,
-                "HIDE"          : self.parent.trigger_hide_codelet,
-                "TOGGLE HIDDEN" : self.parent.toggle_view_hidden,
-                "CLEAR CLOCK"   : self.parent.clear_clock,
-            }
+        self.commands = CommandButtons(self, commands=[
+                ("PUSH"          , self.parent.push_code_to_remote),
+                ("SOLO"          , self.parent.solo_local_code),
+                ("RESET"         , self.parent.reset_program_state),
+                ("ROLLBACK"      , self.parent.trigger_rollback),
+                ("HIDE"          , self.parent.trigger_hide_codelet),
+                ("TOGGLE HIDDEN" , self.parent.toggle_view_hidden),
+                ("CLEAR CLOCK"   , self.parent.clear_clock),
+            ]
         )
 
         # Textbox

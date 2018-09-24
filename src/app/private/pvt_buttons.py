@@ -10,8 +10,8 @@ class CommandButtons(Tk.Frame):
 
         self.num_buttons = 0
 
-        self.commands = commands
-        self.names    = list(commands.keys())
+        self.commands = dict(commands)
+        self.names    = [command[0] for command in commands]
 
         self.button = {}
 
