@@ -9,6 +9,7 @@ import socket
 import json
 import sys
 import random
+import queue
 
 from threading import Thread
 from time import sleep
@@ -46,6 +47,10 @@ class Server(ThreadedServer):
         s.close()
 
         self.address = (self.hostname, self.port)
+
+        # Create a process queue
+
+        self.queue = queue.Queue()
 
         # Keep track of all the connected clients
 
@@ -87,6 +92,10 @@ class Server(ThreadedServer):
         self.app.run()
 
         return
+
+    def add_to_queue(self, message):
+        """ Adds a message to the process queue """
+        return self.queue.put(message)
 
     def kill(self):
         """ Properly terminates the server instance """
@@ -250,12 +259,11 @@ class RequestHandler(socketserver.BaseRequestHandler):
         return
 
     def process_data(self, data):
-        """ Method for handling data that arrives and sends appropriate
-            data out to connected clients """
+        """ Adds the message to the server process Queue which is constantly being polled """
 
         # Handle on the server side
 
-        self.master.app.handle_data(data)
+        self.master.add_to_queue(data)
 
         return
 

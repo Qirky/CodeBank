@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function
+import queue
 from .main import *
 
 # Class for interface on the ServerSide (shown to audience)
@@ -26,6 +27,27 @@ class ServerApp(BasicApp):
 
         # user_id to codelet_id / None
         self.users = {}
+
+        # Poll the parent queue
+
+        self.poll_queue()
+
+    def poll_queue(self):
+        """ Continually poll the server process queue then process each message one at a time
+            in the order it was added to the server. """
+        try:
+
+            while True:
+                data = self.socket.queue.get_nowait()
+                self.handle_data(data)
+
+        # Break the loop when the queue is empty
+        except queue.Empty:
+            pass
+
+        # Call this function in 0.1 second
+        self.root.after(100, self.poll_queue)
+        return
 
     # Handler methods
 

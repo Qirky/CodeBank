@@ -28,7 +28,6 @@ class BasicApp:
         # General config e.g. title
         self.root.protocol("WM_DELETE_WINDOW", self.kill )
 
-
         self.default_font = 'Consolas'
 
         if self.default_font not in tkFont.families():

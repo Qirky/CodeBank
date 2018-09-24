@@ -87,7 +87,7 @@ class CodeBox:
 
         # Draw text -- not possible to do syntax highlighting?
         
-        self.id = canvas.create_text(x_pos + self.padx, y_pos + self.pady, 
+        self.id = int(canvas.create_text(x_pos + self.padx, y_pos + self.pady, 
             anchor=Tk.NW, 
             text=self.get_text(), 
             #text="{} - {}".format(self.get_order_id(), self.get_text()), # debug
@@ -95,6 +95,7 @@ class CodeBox:
             tags=self.text_tag(),
             font=self.root.font,
             fill=self.get_font_colour())
+        )
 
         # Work out height of text
 
@@ -102,11 +103,12 @@ class CodeBox:
 
         # Draw background
 
-        self.bg = canvas.create_rectangle([bounds[0] - self.padx, bounds[1] - self.pady, canvas.get_width(), bounds[3] + self.pady], 
+        self.bg = int(canvas.create_rectangle([bounds[0] - self.padx, bounds[1] - self.pady, canvas.get_width(), bounds[3] + self.pady], 
             fill=self.get_colour(), 
             tag=self.bg_tag(),
             outline=self.get_outline_colour(),
             width=self.bordersize)
+        )
 
         bounds = canvas.bbox(self.bg)
 
