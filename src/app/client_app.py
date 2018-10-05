@@ -112,6 +112,7 @@ class App(BasicApp):
         self._is_enabled = False
         self.workspace.text.config(state=Tk.DISABLED, bg="#b3b3b3")
         self.root.title("CodeBank Client: Not Connected")
+        self.workspace.commands.disable_all()
         # Dissalow codelets to be highlighted
         self.codelet_on_click = lambda *args, **kwargs: None
         self.disable_codelet_highlight = lambda *args, **kwargs: True
@@ -122,6 +123,7 @@ class App(BasicApp):
         self._is_enabled = True
         self.workspace.text.config(state=Tk.NORMAL, bg="white")
         self.root.title("CodeBank Client. Logged in as {}".format(self.get_client_name()))
+        self.workspace.commands.default_all()
         # Allow clicking
         self.codelet_on_click = self.request_codelet
         self.disable_codelet_highlight = self.is_editing_codelet
@@ -139,6 +141,8 @@ class App(BasicApp):
             self.socket.send( MESSAGE_RELEASE(self.get_user_id(), self.get_codelet_id()) )
         
         self.set_codelet_id(NULL)
+
+        self.workspace.commands.default_all()
         
         return
 
@@ -310,7 +314,7 @@ class App(BasicApp):
 
             self.sharedspace.canvas.toggle_view_hidden()
 
-            self.workspace.commands.button["TOGGLE HIDDEN"].toggle()
+            self.workspace.commands["TOGGLE HIDDEN"].toggle() # not a great way to do it
 
             self.sharedspace.redraw()
 
@@ -347,7 +351,7 @@ class App(BasicApp):
             
         else:
             self.selecting_codelet_to_hide = True
-        self.workspace.commands.button["HIDE"].toggle()
+        self.workspace.commands["HIDE"].toggle()
         self.root.config(cursor=self.get_cursor_icon())
         return
 

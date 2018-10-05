@@ -8,25 +8,64 @@ class CommandButtons(Tk.Frame):
         Tk.Frame.__init__(self, parent)
         self.config(width=5, height=25)
 
+        self.commands = commands
+
+        self.buttons = {}
         self.num_buttons = 0
 
-        self.commands = dict(commands)
-        self.names    = [command[0] for command in commands]
+        for cmd in self.commands:
 
-        self.button = {}
-
-        for i, name in enumerate(self.names):
-
-            self.button[name] = Button(self, text=name, borderwidth=1, command=self.commands[name]) # Maybe use a label
-            self.button[name].grid(row=0, column=self.num_buttons, padx=4)
+            self.buttons[cmd.name] = Button(self, cmd)
+            self.buttons[cmd.name].grid(row=0, column=self.num_buttons, padx=4)
             self.num_buttons += 1
 
+        self.set_to_equal_size() # better or not?
+
+    def __getitem__(self, key):
+        return self.buttons[key]
+
+    def set_to_equal_size(self):
+        max_size = max([len(cmd) for cmd in self.buttons]) + 2 # leave space
+        for button in self.buttons.values():
+            button.config(width = max_size)
+        return
+
+    def disable_all(self):
+        for button in self.buttons.values():
+            button.disable()
+        return
+
+    def enable_all(self):
+        for button in self.buttons.values():
+            button.enable()
+        return
+
+    def default_all(self):
+        for button in self.buttons.values():
+            button.set_to_default()
+        return
 
 class Button(Tk.Button):
-    def __init__(self, *args, **kwargs):
-        Tk.Button.__init__(self, *args, **kwargs)
-        self.config(relief=Tk.RAISED)
+    def __init__(self, master, command, *args, **kwargs):
+        Tk.Button.__init__(self, master, *args, **kwargs)
+        self.default_state = command.default_state
+        self.config( relief=Tk.RAISED,
+                     text=command.name, 
+                     borderwidth=1, 
+                     command=command.command) # Maybe use a label
         self._switch = False
+
+    def disable(self):
+        self.config(state=Tk.DISABLED)
+        return
+
+    def enable(self):
+        self.config(state=Tk.NORMAL)
+        return
+
+    def set_to_default(self):
+        self.config(state=self.default_state)
+        return
 
     def toggle(self):
         if self._switch is True:
@@ -37,3 +76,9 @@ class Button(Tk.Button):
             self.config(relief=Tk.SUNKEN)
         return
 
+class CmdButton:
+    """ Abstraction for button behaviour """
+    def __init__(self, name, func, default=Tk.NORMAL):
+        self.name     = name.upper()
+        self.command  = func
+        self.default_state = default

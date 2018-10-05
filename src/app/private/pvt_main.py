@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function
 from ...utils import *
 from ..tkimport import Tk
 from .pvt_text import TextInput
-from .pvt_buttons import CommandButtons
+from .pvt_buttons import CommandButtons, CmdButton
 from .pvt_console import Console
 import sys
 
@@ -17,13 +17,13 @@ class Workspace(Tk.Frame):
         # Buttons
 
         self.commands = CommandButtons(self, commands=[
-                ("PUSH"          , self.parent.push_code_to_remote),
-                ("SOLO"          , self.parent.solo_local_code),
-                ("RESET"         , self.parent.reset_program_state),
-                ("ROLLBACK"      , self.parent.trigger_rollback),
-                ("HIDE"          , self.parent.trigger_hide_codelet),
-                ("TOGGLE HIDDEN" , self.parent.toggle_view_hidden),
-                ("CLEAR CLOCK"   , self.parent.clear_clock),
+                CmdButton("PUSH"          , self.parent.push_code_to_remote),
+                CmdButton("SOLO"          , self.parent.solo_local_code),
+                CmdButton("RESET"         , self.parent.reset_program_state),
+                CmdButton("ROLLBACK"      , self.parent.trigger_rollback, default=Tk.DISABLED),
+                CmdButton("HIDE"          , self.parent.trigger_hide_codelet),
+                CmdButton("TOGGLE HIDDEN" , self.parent.toggle_view_hidden),
+                CmdButton("CLEAR CLOCK"   , self.parent.clear_clock),
             ]
         )
 
@@ -100,6 +100,7 @@ class Workspace(Tk.Frame):
         """ Deletes the contents of the text box and sets current_codelet to None """
         self.text.clear()
         self.parent.set_codelet_id(NULL)
+        self.commands.default_all()
         return
 
     def load_from_codelet(self, codelet_id):
@@ -107,6 +108,7 @@ class Workspace(Tk.Frame):
         codelet = self.parent.sharedspace.codelets[codelet_id]
         self.parent.set_codelet_id(codelet_id)
         self.text.set_text(codelet.get_text().strip())
+        self.commands.enable_all()
         return
 
     # Methods for running code

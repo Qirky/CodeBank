@@ -27,6 +27,16 @@ class TextInput(Tk.Text):
 
         self.tag_config("highlight", background="red", foreground="white")
 
+        # Disable certain actions
+
+        disable = lambda e: "break"
+
+        import string
+
+        for key in list(string.digits + string.ascii_letters) + ["slash"]:
+
+            self.bind("<{}-{}>".format(CONTROL_KEY, key), disable)
+
         self.bind("<Key>",       self.keypress)
         self.bind("<Return>",    self.return_key)
         self.bind("<Escape>",    lambda *e: self.root.reset_program_state())
@@ -35,6 +45,8 @@ class TextInput(Tk.Text):
 
         self.bind("<{}-z>".format(CONTROL_KEY), lambda e: None)
         self.bind("<{}-y>".format(CONTROL_KEY), lambda e: None)
+
+        self.bind("<{}-a>".format(CONTROL_KEY), self.select_all)
 
         self.config(undo=True, autoseparators=True, maxundo=50)
 
@@ -57,6 +69,10 @@ class TextInput(Tk.Text):
         self.edit_reset()
         self.update_colours()
         return
+
+    def select_all(self, event=None):
+        self.tag_add(Tk.SEL, "1.0", Tk.END)
+        return "break"
 
     def clear(self):
         """ Deletes the contents of the text box """
