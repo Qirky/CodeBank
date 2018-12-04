@@ -50,8 +50,9 @@ class BasicApp:
         self.root.bind("<{}-equal>".format(CONTROL_KEY), self.increase_font_size)
         self.root.bind("<{}-minus>".format(CONTROL_KEY), self.decrease_font_size)
 
-        # Socket is an instance of Client
+        # Socket is an instance of Client / Server
         self.socket = client
+        self.users  = self.socket.users
 
         # Top canvas box for containing code blocks
         self.sharedspace = SharedSpace(self)
@@ -147,17 +148,20 @@ class BasicApp:
 
     def add_user(self, user_id, name):
         """ Stores a user's name and associates it with their ID - also updates UI based on this info """
-        self.socket.users[user_id] = name
-        self.sharedspace.peer_box.add_user(user_id, name)
+        self.socket.users[user_id] = User(user_id, name)
         return
 
     def get_user_name(self, user_id):
-        return self.socket.users[user_id]
+        return self.socket.users[user_id].get_name()
 
     def remove_user(self, user_id):
         if user_id in self.socket.users:
             del self.socket.users[user_id]
-            self.sharedspace.peer_box.remove_user(user_id)
+        return
+
+    def set_user_typing(self, user_id, flag):
+        """ Flags whether a user is typing a new codelet or not """
+        self.socket.users[user_id].set_is_typing(flag)
         return
 
     def increase_font_size(self, event=None):

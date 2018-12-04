@@ -42,6 +42,7 @@ class App(BasicApp):
             HANDLE_UNDO     : self.rollback,
             HANDLE_NAME     : self.add_user,
             HANDLE_SET_ID   : self.set_user_id,
+            HANDLE_TYPING   : self.set_user_typing,
             HANDLE_RELEASE  : self.release_codelet,
             HANDLE_ERROR    : self.raise_error,
             HANDLE_INFO     : self.print_msg,
@@ -173,6 +174,12 @@ class App(BasicApp):
 
     def set_codelet_id(self, c_id):
         self.current_codelet = c_id
+        return
+
+    def set_user_typing(self, user_id, *args):
+        """ Update typing ellipses when users are typing """
+        if not self.my_id(user_id):
+            BasicApp.set_user_typing(self, *args)
         return
 
     def request_codelet(self, codelet_id):
@@ -413,6 +420,19 @@ class App(BasicApp):
     def my_id(self, user_id):
         """ Returns True if the  user id is that of the local client """
         return user_id == self.socket.user_id
+
+    def flag_user_typing(self, flag):
+        """ Sends a message to the server flagging this user as typing a new codelet """
+        
+        data = MESSAGE_TYPING(self.get_user_id(), flag)
+
+        if self.socket.is_connected():
+
+            self.socket.send(data)
+
+        return
+
+    #####
 
     # Handler methods
 

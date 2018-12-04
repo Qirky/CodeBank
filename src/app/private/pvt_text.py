@@ -51,6 +51,7 @@ class TextInput(Tk.Text):
         self.config(undo=True, autoseparators=True, maxundo=50)
 
         self.key_down = False
+        self.is_typing = False
 
     @staticmethod
     def convert_index(index1, index2=None):
@@ -60,7 +61,7 @@ class TextInput(Tk.Text):
         
     def get_text(self):
         """ Returns the contents of the text box """
-        return self.get(1.0, Tk.END)
+        return self.get(1.0, Tk.END).strip()
 
     def set_text(self, text):
         """ Sets the contents of the text box """
@@ -78,6 +79,7 @@ class TextInput(Tk.Text):
         """ Deletes the contents of the text box """
         self.delete(1.0, Tk.END)
         self.edit_reset()
+        self.set_typing(False)
         return
 
     def keypress(self, event):
@@ -85,21 +87,43 @@ class TextInput(Tk.Text):
 
         self.root.unhighlight_all_codelets()
 
-        if event.keysym == "BackSpace":
+        if event.keysym in ("BackSpace", "Delete"):
+            
             self.edit_separator()
-            return
+
+            # If we are deleting the last character, flag typing as False
+
+            sel = self.delete_selection()
+
+            if sel:
+
+                return "break"
+
+            elif len(self.get_text()) == 1:
+        
+                self.set_typing(False)
+        
         elif event.char != "":
+            
             if event.char == "\r":
                 char = "\n"
             elif event.char == "\t":
                 char = " "*4
             else:
                 char = event.char
+            
             index = self.index(Tk.INSERT)
+            
+            # if we have a selection, delete it first
+            self.delete_selection()
             self.insert(index, char)
             self.update_colours()
             self.edit_separator()
+
+            self.set_typing(True)
+            
             return "break"
+        
         return
 
     def return_key(self, event=None):
@@ -197,4 +221,30 @@ class TextInput(Tk.Text):
 
             print(e)
 
+        return
+
+    def delete_selection(self):
+        """ If an area is selected, it is deleted and returns True """
+        try:
+            text = self.get(Tk.SEL_FIRST, Tk.SEL_LAST)
+            a, b = self.index(Tk.SEL_FIRST), self.index(Tk.SEL_LAST)
+            self.delete(Tk.SEL_FIRST, Tk.SEL_LAST)
+            # If there is no text left, flag the user as not typing
+            if len(self.get_text()) == 0:
+                self.set_typing(False)
+            return True        
+        except Tk.TclError:
+            return False
+
+
+    def set_typing(self, flag):
+        """ Flags the user as typing or not, and sends the information
+            to the server if it has changed
+        """
+        # Send to the server if the internal flag has changed
+        if flag != self.is_typing:
+            # Only set_typing if the user is editing a new codelet
+            if self.root.get_codelet_id() is NULL:
+                self.parent.flag_user_typing(flag)
+            self.is_typing = flag
         return

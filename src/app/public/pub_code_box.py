@@ -89,8 +89,7 @@ class CodeBox:
         
         self.id = int(canvas.create_text(x_pos + self.padx, y_pos + self.pady, 
             anchor=Tk.NW, 
-            text=self.get_text(), 
-            #text="{} - {}".format(self.get_order_id(), self.get_text()), # debug
+            text=self.get_text(),
             width=canvas.get_width() - (self.padx * 2), 
             tags=self.text_tag(),
             font=self.root.font,

@@ -60,7 +60,7 @@ class Server(ThreadedServer):
         self.__seed        = random.randint(0, 2048) # Force all clients to use the same seed
 
         self.clients       = [] # Client objects
-        self.users         = {} # ID: Name
+        self.users         = {} # ID: instance of User
 
         # Instantiate server process
 

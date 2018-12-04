@@ -1,3 +1,5 @@
+from .utils import GET_USER_COLOUR
+
 class Codelet:
     def __init__(self, id_num, user_id, string, order_id=0):
         # Unique identifier
@@ -89,3 +91,39 @@ class Codelet:
 
     def has_error(self):
         return self.error
+
+
+
+class User:
+    """ Class for representing each user;
+        - name: str
+        - codelet_id they are editing (None if not editing): int / None (maybe use -1 in place of None?)
+        - is_typing, flag if user is adding a new codelet: bool
+    """
+    def __init__(self, id_num, name):
+        self.id = int(id_num)
+        self.name = name
+        self.codelet_id = None
+        self.is_typing = False
+        self.colour = GET_USER_COLOUR(self.id)
+
+    def __repr__(self):
+        return self.name
+
+    def get_name(self):
+        return self.name
+
+    def get_colour(self):
+        return self.colour
+
+    def get_is_typing(self):
+        return self.is_typing
+
+    def set_is_typing(self, flag):
+        self.is_typing = bool(flag)
+
+    def assign_codelet(self, i):
+        self.codelet_id = i
+
+    def clear_codelet(self):
+        self.codelet_id = None

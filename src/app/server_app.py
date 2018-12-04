@@ -23,10 +23,8 @@ class ServerApp(BasicApp):
             HANDLE_REQUEST : self.handle_request_codelet,
             HANDLE_RELEASE : self.handle_release_codelet,
             HANDLE_REMOVE  : self.remove_user,
+            HANDLE_TYPING  : self.set_user_typing,
         }
-
-        # user_id to codelet_id / None
-        self.users = {}
 
         # Poll the parent queue
 
@@ -75,7 +73,7 @@ class ServerApp(BasicApp):
 
                 codelet.assign_editor(user_id)
 
-                self.users[user_id] = codelet_id
+                self.users[user_id].assign_codelet( codelet_id )
 
                 # Send data to clients, if the user_id's match then they are allowed to use it
 
@@ -112,7 +110,7 @@ class ServerApp(BasicApp):
 
         # Store the fact that the user isn't currently working on a codelet
 
-        self.users[user_id] = None
+        self.users[user_id].clear_codelet()
 
         # Evaluate the code
 

@@ -144,3 +144,7 @@ class Workspace(Tk.Frame):
         self.parent.push_code_to_remote()
 
         return "break"
+
+    def flag_user_typing(self, *args):
+        """ Send a message to the   """
+        return self.parent.flag_user_typing(*args)
