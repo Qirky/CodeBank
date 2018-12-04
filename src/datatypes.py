@@ -1,4 +1,4 @@
-from .utils import GET_USER_COLOUR
+from .utils import GET_USER_COLOUR, NULL
 
 class Codelet:
     def __init__(self, id_num, user_id, string, order_id=0):
@@ -119,6 +119,9 @@ class User:
     def get_is_typing(self):
         return self.is_typing
 
+    def get_codelet_id(self):
+        return
+
     def set_is_typing(self, flag):
         self.is_typing = bool(flag)
 
@@ -126,4 +129,4 @@ class User:
         self.codelet_id = i
 
     def clear_codelet(self):
-        self.codelet_id = None
+        self.codelet_id = NULL

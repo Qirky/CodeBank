@@ -11,7 +11,7 @@ class SharedCanvas(Tk.Canvas):
         self.padx = 10
         self.pady = 10
 
-        self.bind("<Configure>", lambda e: self.redraw())
+        self.bind("<Configure>", lambda e: self.parent.redraw())
 
     def add(self, codebox):
         self.codeboxes.append(codebox)
@@ -29,6 +29,7 @@ class SharedCanvas(Tk.Canvas):
 
     def redraw(self):
         """ Redraws all the codebox labels in order of most recently edited """
+
         y = 0
         for codebox in self.ordered():
             
@@ -46,3 +47,10 @@ class SharedCanvas(Tk.Canvas):
 
     def get_width(self):
         return self.winfo_width() - self.padx
+
+    def get_visible_area(self, event=None):
+        x1 = self.canvasx(0)
+        y1 = self.canvasy(0)
+        x2 = self.canvasx(self.winfo_width())
+        y2 = self.canvasy(self.winfo_height())
+        return (x1,y1,x2,y2)

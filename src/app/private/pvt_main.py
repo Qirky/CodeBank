@@ -54,9 +54,7 @@ class Workspace(Tk.Frame):
         self.y_scroll = Tk.Scrollbar(self)
         self.y_scroll.config(command=self.console.yview, orient=Tk.VERTICAL)
 
-        self.console.config(
-            yscrollcommand=self.y_scroll.set,
-            )
+        self.console.config(yscrollcommand=self.y_scroll.set)
 
         # Grid
 

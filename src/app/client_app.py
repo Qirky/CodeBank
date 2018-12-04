@@ -580,7 +580,7 @@ class App(BasicApp):
         return
 
     def highlight_codelet_up(self, event=None):
-        """ Called when the user uses Alt+Up to cycle through the  """
+        """ Called when the user uses Alt+Up to cycle through the codelets """
         if self.current_codelet == NULL:
             codeboxes = self.sharedspace.canvas.visible_codelets()
             if self.highlighted_codelet == -1:
@@ -599,8 +599,28 @@ class App(BasicApp):
                     codebox = codeboxes[0]
             self.highlight_codelet(codebox.codelet.id)
             self.sharedspace.canvas.redraw()
+
+            # If codebox not in view, scroll up until it is
+
+            if not codebox.in_view():
+
+                self.sharedspace.canvas.yview_moveto(1)
+
+                while not codebox.in_view():
+
+                    self.sharedspace.canvas.yview_scroll(-1, "units")
+                    self.sharedspace.canvas.update()
+
+                    # If scrolled to top, break
+
+                    if self.sharedspace.y_scroll.get()[0] == 1.0:
+
+                        break
+            
             self.set_mouse_in_codebox(False)
+
         else:
+            
             return "break"
 
     def highlight_codelet_down(self, event=None):
@@ -620,6 +640,26 @@ class App(BasicApp):
                     codebox = this_codebox
             self.highlight_codelet(codebox.codelet.id)
             self.sharedspace.canvas.redraw()
+
+            # If codebox not in view, scroll down until it is
+
+            if not codebox.in_view():
+
+                self.sharedspace.canvas.yview_moveto(0)
+
+                while not codebox.in_view():
+
+                    self.sharedspace.canvas.yview_scroll(1, "units")
+                    self.sharedspace.canvas.update()
+
+                    # If scrolled to bottom, break
+
+                    if self.sharedspace.y_scroll.get()[1] == 1.0:
+
+                        break
+
             self.set_mouse_in_codebox(False)
+
         else:
+            
             return "break"

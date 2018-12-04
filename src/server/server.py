@@ -147,7 +147,7 @@ class Server(ThreadedServer):
                 del self.clients[i]
 
                 # If the user has loaded a codelet, release it
-                codelet_id = self.app.users.get(client.id, None)
+                codelet_id = self.users.get(client.id, None)
                 
                 if codelet_id is not None:
                 
@@ -292,9 +292,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def pull_all_code(self):
         """ Sends all current codelet data to the client """
         # Get all the connected users
-        for id_num, name in self.master.users.items():
+        for id_num, user in self.master.users.items():
             if id_num != self.get_user_id():
-                self.send(MESSAGE_NAME(id_num, name))
+                self.send(MESSAGE_NAME(id_num, user.get_name()))
 
         # Get all the code
         for codelet in self.master.app.get_codelets():

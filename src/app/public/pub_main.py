@@ -31,6 +31,13 @@ class SharedSpace(Tk.Frame):
 
         self.drag_mouse_down = False
 
+        # Scroll binds for canvas (button 4/5 is for Linux)
+
+        self.mouse_scroll = MouseScroll(self)
+        self.parent.root.bind("<MouseWheel>", self.mouse_scroll)
+        self.parent.root.bind("<Button-4>",   self.mouse_scroll)
+        self.parent.root.bind("<Button-5>",   self.mouse_scroll)
+
         # Peers list
 
         self.peer_box = PeerBox(self)
@@ -58,7 +65,10 @@ class SharedSpace(Tk.Frame):
         return
 
     def redraw(self):
+        """ Redraw the canvas and update the scroll region """
         self.canvas.redraw()
+        self.canvas.config(scrollregion=self.canvas.bbox(Tk.ALL))
+        return
 
     def drag_mouseclick(self, event=None):
         """ Flags the mouse as clicked for drag action """
@@ -89,3 +99,15 @@ class SharedSpace(Tk.Frame):
             return "break"
 
         return
+
+
+class MouseScroll:
+    def __init__(self, parent):
+        self.parent = parent
+    def delta(self, event):
+        if event.num == 5 or event.delta < 0:
+            return 1 
+        return -1
+    def __call__(self, event):
+        delta = self.delta(event)
+        self.parent.canvas.yview_scroll(delta, "units")
