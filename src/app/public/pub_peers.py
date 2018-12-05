@@ -106,8 +106,10 @@ class PeerBox(Tk.Frame):
                 self.listbox.tag_lower(dot)
 
         # Store height
+
+        bounds = self.listbox.bbox(rect)
         
-        self.box_height = bounds[3] - bounds[1]
+        self.box_height = (bounds[3] - bounds[1]) - self.pady
         
         return 
 

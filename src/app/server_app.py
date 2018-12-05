@@ -22,8 +22,8 @@ class ServerApp(BasicApp):
             HANDLE_UNDO    : self.handle_rollback,
             HANDLE_REQUEST : self.handle_request_codelet,
             HANDLE_RELEASE : self.handle_release_codelet,
+            HANDLE_TYPING  : self.handle_set_user_typing,
             HANDLE_REMOVE  : self.remove_user,
-            HANDLE_TYPING  : self.set_user_typing,
         }
 
         # Poll the parent queue
@@ -141,4 +141,10 @@ class ServerApp(BasicApp):
         self.get_codelet(codelet_id).rollback()
         self.sharedspace.redraw()
         self.socket.send_to_all(MESSAGE_UNDO(user_id, codelet_id))
+        return
+
+    def handle_set_user_typing(self, user_id, flag):
+        """ Flags a user as typing then forward to all other connected users """
+        BasicApp.set_user_typing(self, user_id, flag)
+        self.socket.send_to_all(MESSAGE_TYPING(user_id, flag))
         return

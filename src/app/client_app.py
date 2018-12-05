@@ -176,10 +176,10 @@ class App(BasicApp):
         self.current_codelet = c_id
         return
 
-    def set_user_typing(self, user_id, *args):
+    def set_user_typing(self, user_id, flag):
         """ Update typing ellipses when users are typing """
         if not self.my_id(user_id):
-            BasicApp.set_user_typing(self, *args)
+            BasicApp.set_user_typing(self, user_id, flag)
         return
 
     def request_codelet(self, codelet_id):
