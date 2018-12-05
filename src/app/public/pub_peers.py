@@ -94,7 +94,8 @@ class PeerBox(Tk.Frame):
 
         self.listbox.tag_lower(rect, text)
 
-        if user.get_is_typing():
+        # if user.get_is_typing():
+        if True:
 
             self.listbox.tag_lower(text)
             self.listbox.tag_lower(rect)
@@ -107,7 +108,7 @@ class PeerBox(Tk.Frame):
 
         # Store height
         
-        self.box_height = bounds[3]
+        self.box_height = bounds[3] - bounds[1]
         
         return 
 

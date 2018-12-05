@@ -176,14 +176,12 @@ class CodeBox:
 
     def in_view(self):
         """ Returns True if the code box is fully in view of the canvas """
+        
         bbox = self.bbox()
         area = self.parent.canvas.get_visible_area()
 
         y1, y2 = bbox[1], bbox[3]
         v1, v2 = area[1], area[3]
-
-        #print(y1, v1, y1 > v1)
-        #print(y2, v2, y2 < v2)
 
         return (y1 > v1 and y2 < v2)
 
