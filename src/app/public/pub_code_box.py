@@ -17,7 +17,7 @@ class CodeBox:
         self.codelet = codelet
 
         self.parent.canvas.add(self)
-        self.parent.canvas.redraw()
+        self.parent.redraw()
 
     def get_text(self):
         return self.codelet.get_text()
@@ -77,7 +77,7 @@ class CodeBox:
         """ Called when a codelet is pushed with an existing ID """
         self.codelet.update(user_id, string, order_number)
         self.codelet.unassign_editor()
-        self.parent.canvas.redraw()
+        self.parent.redraw()
         return
 
     def draw(self, x_pos, y_pos):
