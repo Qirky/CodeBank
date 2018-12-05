@@ -567,7 +567,7 @@ class App(BasicApp):
         if self.highlighted_codelet != NULL:
             self.sharedspace.codelets[self.highlighted_codelet].de_highlight()
             self.highlighted_codelet = NULL
-            self.sharedspace.canvas.redraw()
+            self.sharedspace.redraw()
         return
 
     def highlight_codelet(self, codelet_id):
@@ -597,8 +597,10 @@ class App(BasicApp):
                     codebox = this_codebox
                 else:
                     codebox = codeboxes[0]
+            
             self.highlight_codelet(codebox.codelet.id)
-            self.sharedspace.canvas.redraw()
+            
+            self.sharedspace.redraw()
 
             # If codebox not in view, scroll up until it is
 
@@ -638,8 +640,10 @@ class App(BasicApp):
                         this_codebox.codelet.de_highlight()
                         break
                     codebox = this_codebox
+            
             self.highlight_codelet(codebox.codelet.id)
-            self.sharedspace.canvas.redraw()
+            
+            self.sharedspace.redraw()
 
             # If codebox not in view, scroll down until it is
 

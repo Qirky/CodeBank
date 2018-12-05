@@ -1,5 +1,7 @@
 from __future__ import absolute_import, print_function
 
+import queue
+
 from ..tkimport import Tk
 from .pub_canvas import SharedCanvas
 from .pub_code_box import CodeBox
@@ -59,15 +61,41 @@ class SharedSpace(Tk.Frame):
 
         self.codelets = {}
 
+        # Thread safe redraw queue
+        self.queue = queue.Queue()
+        self.poll_queue()
+
     def add_codelet(self, codelet):
         """ Adds a new codelet to the canvas wrapped in a CodeBox instance """
         self.codelets[codelet.id] = CodeBox(self, codelet)
         return
 
     def redraw(self):
-        """ Redraw the canvas and update the scroll region """
+        """ Schedules a redraw the canvas and update the scroll region that is thread-safe """
+        self.queue.put(self._thread_safe_redraw)
+        return
+    
+    def _thread_safe_redraw(self):
+        """ Canvas redraw functions to be called without race conditions """
         self.canvas.redraw()
         self.canvas.config(scrollregion=self.canvas.bbox(Tk.ALL))
+        return
+
+    def poll_queue(self):
+        """ Recursive call to poll the redraw queue and safely redraw the canvas """
+        try:
+
+            while True:
+                
+                func = self.queue.get_nowait()
+                func.__call__()
+
+        # Break the loop when the queue is empty        
+        except queue.Empty:
+            pass
+
+        # Call ~33 times a second
+        self.after(30, self.poll_queue)
         return
 
     def drag_mouseclick(self, event=None):
