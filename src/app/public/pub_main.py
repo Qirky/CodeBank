@@ -11,59 +11,62 @@ class SharedSpace(Tk.Frame):
     def __init__(self, parent):
         # Create a single frame to hold the representations of code chunks
         self.parent = parent
-        Tk.Frame.__init__(self, self.parent.root)
-
-        # Canvas and y-scroll
-        self.canvas = SharedCanvas(self, width=640, height=480, bg="gray")
-
-        self.y_scroll = Tk.Scrollbar(self)
-        self.y_scroll.config(command=self.canvas.yview, orient=Tk.VERTICAL)
-
-        self.canvas.config(
-            yscrollcommand=self.y_scroll.set,
-            scrollregion=self.canvas.bbox(Tk.ALL)
-            )
-
-        # Box for changing size - self.parent.root
-
-        self.drag = Tk.Frame( self, bg="white", width=5, cursor="sb_h_double_arrow") # why does it need to be parent.root?
-        self.drag.bind("<Button-1>",        self.drag_mouseclick)        
-        self.drag.bind("<ButtonRelease-1>", self.drag_mouserelease)
-        self.drag.bind("<B1-Motion>",       self.drag_mousedrag)
-
-        self.drag_mouse_down = False
-
-        # Scroll binds for canvas (button 4/5 is for Linux)
-
-        self.mouse_scroll = MouseScroll(self)
-        self.parent.root.bind("<MouseWheel>", self.mouse_scroll)
-        self.parent.root.bind("<Button-4>",   self.mouse_scroll)
-        self.parent.root.bind("<Button-5>",   self.mouse_scroll)
-
-        # Peers list
-
-        self.peer_box = PeerBox(self)
-
-        # Only expand canvas
-
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        # Grid
-        
-        self.canvas.grid(row=0, column=0, sticky=Tk.NSEW)
-        self.drag.grid(row=0, column=1, sticky=Tk.NSEW)
-        self.peer_box.grid(row=0, column=2, sticky=Tk.NSEW)
-        self.peer_box.grid_propagate(False)
-        self.y_scroll.grid(row=0, column=3, sticky=Tk.NSEW)
 
         # Codelet / codebox information
 
         self.codelets = {}
 
-        # Thread safe redraw queue
-        self.queue = queue.Queue()
-        self.poll_queue()
+        if self.parent.visible:
+
+            Tk.Frame.__init__(self, self.parent.root)
+
+            # Canvas and y-scroll
+            self.canvas = SharedCanvas(self, width=640, height=480, bg="gray")
+
+            self.y_scroll = Tk.Scrollbar(self)
+            self.y_scroll.config(command=self.canvas.yview, orient=Tk.VERTICAL)
+
+            self.canvas.config(
+                yscrollcommand=self.y_scroll.set,
+                scrollregion=self.canvas.bbox(Tk.ALL)
+                )
+
+            # Box for changing size - self.parent.root
+
+            self.drag = Tk.Frame( self, bg="white", width=5, cursor="sb_h_double_arrow") # why does it need to be parent.root?
+            self.drag.bind("<Button-1>",        self.drag_mouseclick)        
+            self.drag.bind("<ButtonRelease-1>", self.drag_mouserelease)
+            self.drag.bind("<B1-Motion>",       self.drag_mousedrag)
+
+            self.drag_mouse_down = False
+
+            # Scroll binds for canvas (button 4/5 is for Linux)
+
+            self.mouse_scroll = MouseScroll(self)
+            self.parent.root.bind("<MouseWheel>", self.mouse_scroll)
+            self.parent.root.bind("<Button-4>",   self.mouse_scroll)
+            self.parent.root.bind("<Button-5>",   self.mouse_scroll)
+
+            # Peers list
+
+            self.peer_box = PeerBox(self)
+
+            # Only expand canvas
+
+            self.grid_columnconfigure(0, weight=1)
+            self.grid_rowconfigure(0, weight=1)
+
+            # Grid
+            
+            self.canvas.grid(row=0, column=0, sticky=Tk.NSEW)
+            self.drag.grid(row=0, column=1, sticky=Tk.NSEW)
+            self.peer_box.grid(row=0, column=2, sticky=Tk.NSEW)
+            self.peer_box.grid_propagate(False)
+            self.y_scroll.grid(row=0, column=3, sticky=Tk.NSEW)
+
+            # Thread safe redraw queue
+            self.queue = queue.Queue()
+            self.poll_queue()
 
     def add_codelet(self, codelet):
         """ Adds a new codelet to the canvas wrapped in a CodeBox instance """

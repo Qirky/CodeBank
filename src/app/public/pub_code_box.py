@@ -16,8 +16,10 @@ class CodeBox:
         
         self.codelet = codelet
 
-        self.parent.canvas.add(self)
-        self.parent.redraw()
+        if self.root.visible:
+
+            self.parent.canvas.add(self)
+            self.parent.redraw()
 
     def get_text(self):
         return self.codelet.get_text()

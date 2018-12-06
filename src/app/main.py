@@ -23,32 +23,41 @@ class BasicApp:
     text = None
     visible = True
     def __init__(self, client, lang, *args, **kwargs):
-        self.root=Tk.Tk()
 
-        # General config e.g. title
-        self.root.protocol("WM_DELETE_WINDOW", self.kill )
+        self.visible = kwargs.get("visible", True)
 
-        self.default_font = 'Consolas'
+        if self.visible:
 
-        if self.default_font not in tkFont.families():
+            self.root=Tk.Tk()
 
-            if SYSTEM == WINDOWS:
+            # General config e.g. title
+            self.root.protocol("WM_DELETE_WINDOW", self.kill )
 
-                self.default_font = "Consolas"
+            self.default_font = 'Consolas'
 
-            elif SYSTEM == MAC_OS:
+            if self.default_font not in tkFont.families():
 
-                self.default_font = "Monaco"
+                if SYSTEM == WINDOWS:
 
-            else:
+                    self.default_font = "Consolas"
 
-                self.default_font = "Courier New"
+                elif SYSTEM == MAC_OS:
 
-        self.font = tkFont.Font(font=(self.default_font, 12), name="CodeFont")
-        self.font.configure(family=self.default_font)
+                    self.default_font = "Monaco"
 
-        self.root.bind("<{}-equal>".format(CONTROL_KEY), self.increase_font_size)
-        self.root.bind("<{}-minus>".format(CONTROL_KEY), self.decrease_font_size)
+                else:
+
+                    self.default_font = "Courier New"
+
+            self.font = tkFont.Font(font=(self.default_font, 12), name="CodeFont")
+            self.font.configure(family=self.default_font)
+
+            self.root.bind("<{}-equal>".format(CONTROL_KEY), self.increase_font_size)
+            self.root.bind("<{}-minus>".format(CONTROL_KEY), self.decrease_font_size)
+
+        else:
+
+            self.root = None
 
         # Socket is an instance of Client / Server
         self.socket = client
@@ -56,16 +65,19 @@ class BasicApp:
 
         # Top canvas box for containing code blocks
         self.sharedspace = SharedSpace(self)
-        self.sharedspace.grid(row=0, column=0, sticky=Tk.NSEW)
-        self.root.grid_columnconfigure(0, weight=1)
-        self.root.grid_rowconfigure(0, weight=1)
 
-        # Action for on-click of codelets -- maybe put  in def disable
+        if self.visible:
 
-        self.codelet_on_click = lambda *args, **kwargs: None
-        self.disable_codelet_highlight = lambda *args, **kwargs: True
+            self.sharedspace.grid(row=0, column=0, sticky=Tk.NSEW)
+            self.root.grid_columnconfigure(0, weight=1)
+            self.root.grid_rowconfigure(0, weight=1)
 
-        self._mouse_in_codebox_flag = False
+            # Action for on-click of codelets -- maybe put  in def disable
+
+            self.codelet_on_click = lambda *args, **kwargs: None
+            self.disable_codelet_highlight = lambda *args, **kwargs: True
+
+            self._mouse_in_codebox_flag = False
 
         # FoxDot interpreter
 
@@ -81,8 +93,13 @@ class BasicApp:
 
     def kill(self, *args, **kwargs):
         """ Correctly shuts down the application """        
+    
         self.socket.kill()
-        self.root.destroy()
+    
+        if self.visible:
+    
+            self.root.destroy()
+    
         return
 
     def handle_data(self, data):

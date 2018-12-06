@@ -9,8 +9,6 @@ class ServerApp(BasicApp):
         
         BasicApp.__init__(self, *args, **kwargs)
 
-        self.root.title("CodeBank Server: {}".format(self.socket.hostname))
-
         # Data handlers to handle messages from the clients
 
         self.handlers = {
@@ -26,11 +24,11 @@ class ServerApp(BasicApp):
             HANDLE_REMOVE  : self.remove_user,
         }
 
-        self.visible = kwargs.get("visible", True)
-
         # Poll the parent queue
 
         if self.visible:
+
+            self.root.title("CodeBank Server: {}".format(self.socket.hostname))
 
             self.poll_queue()
 
