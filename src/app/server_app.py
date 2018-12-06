@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
-import queue
+import queue, time, threading
 from .main import *
 
 # Class for interface on the ServerSide (shown to audience)
@@ -26,9 +26,25 @@ class ServerApp(BasicApp):
             HANDLE_REMOVE  : self.remove_user,
         }
 
+        self.visible = kwargs.get("visible", True)
+
         # Poll the parent queue
 
-        self.poll_queue()
+        if self.visible:
+
+            self.poll_queue()
+
+    def run(self):
+        if self.visible:
+            BasicApp.run(self)
+        else:
+            # Poll queue after server has started w/o runnng mainloop
+            try:
+                self.poll_queue()
+            except KeyboardInterrupt:
+                self.kill()
+        return
+
 
     def poll_queue(self):
         """ Continually poll the server process queue then process each message one at a time
@@ -36,7 +52,9 @@ class ServerApp(BasicApp):
         try:
 
             while True:
+                
                 data = self.socket.queue.get_nowait()
+                
                 self.handle_data(data)
 
         # Break the loop when the queue is empty
@@ -44,7 +62,16 @@ class ServerApp(BasicApp):
             pass
 
         # Call this function in 0.1 second
-        self.root.after(100, self.poll_queue)
+        if self.visible:    
+        
+            self.root.after(100, self.poll_queue)
+        
+        elif self.socket.running:
+        
+            time.sleep(0.1)
+        
+            self.poll_queue()
+        
         return
 
     # Handler methods

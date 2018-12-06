@@ -21,8 +21,8 @@ except:
 
 class BasicApp:
     text = None
-
-    def __init__(self, client, lang):
+    visible = True
+    def __init__(self, client, lang, *args, **kwargs):
         self.root=Tk.Tk()
 
         # General config e.g. title
@@ -99,7 +99,9 @@ class BasicApp:
         
             handle(userid, *packet)
 
-        except RuntimeError:
+        except RuntimeError as e:
+
+            print(e)
 
             pass
         

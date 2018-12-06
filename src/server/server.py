@@ -25,7 +25,7 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
 class Server(ThreadedServer):
     """ Wrapper to the threaded server instance """
-    def __init__(self, port=57890):
+    def __init__(self, port=57890, **kwargs):
 
         # Get password
         try:
@@ -75,7 +75,7 @@ class Server(ThreadedServer):
 
         import FoxDot
 
-        self.app = ServerApp(self, FoxDot)
+        self.app = ServerApp(self, FoxDot, **kwargs)
         self.app.update_random_seed(seed=self.get_seed())
 
     def __str__(self):

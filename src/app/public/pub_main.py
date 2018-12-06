@@ -72,7 +72,8 @@ class SharedSpace(Tk.Frame):
 
     def redraw(self):
         """ Schedules a redraw the canvas and update the scroll region that is thread-safe """
-        self.queue.put(self._thread_safe_redraw)
+        if self.parent.visible:
+            self.queue.put(self._thread_safe_redraw)
         return
     
     def _thread_safe_redraw(self):
