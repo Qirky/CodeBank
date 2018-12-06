@@ -10,7 +10,7 @@ class MenuBar(Tk.Menu):
         # File menu
 
         filemenu =  Tk.Menu(self, tearoff=0)
-        filemenu.add_command(label="Connect to server", command=self.parent.init_connection)
+        filemenu.add_command(label="Connect to server", command=self.parent.init_connection, accelerator="Ctrl+N")
         self.add_cascade(label="File", menu=filemenu)        
 
         editmenu = Tk.Menu(self, tearoff=0)

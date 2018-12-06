@@ -2,7 +2,7 @@ from __future__ import absolute_import, print_function
 
 from .main import *
 from .connection_input import popup_window
-from ..utils import get_players, NULL
+from ..utils import get_players, NULL, CONTROL_KEY
 
 # Class for interface for client-side
 
@@ -23,6 +23,8 @@ class App(BasicApp):
 
         self.menu = MenuBar(self)
         self.root.config(menu=self.menu)
+        self.root.bind("<{}-n>".format(CONTROL_KEY), self.init_connection)
+        self.popup_open = False
 
         # Lower text box for client text entry
 
@@ -87,7 +89,9 @@ class App(BasicApp):
 
     def init_connection(self, event=None):
         """ Create an input dialog for entering information about the user and server """
-        if not self.socket.is_connected():
+        if not self.socket.is_connected() and self.popup_open == False:
+
+            self.popup_open = True
             
             info = self.get_connection_info()
 
@@ -106,6 +110,9 @@ class App(BasicApp):
                 except ConnectionError as e:
 
                     print("Connection Error: {}".format(e))
+
+            self.popup_open = False
+            
         return
 
     def disable(self):
@@ -533,15 +540,7 @@ class App(BasicApp):
 
     def add_user(self, user_id, name):
         """ Adds a user to the address book and updates the UI title if the local client """
-
         BasicApp.add_user(self, user_id, name)
-        
-        # Update the UI
-        
-        # if self.my_id(user_id):
-        
-        #     self.root.title("CodeBank Client. Logged in as {}".format(name))
-
         return
 
     def remove_user(self, user_id):
