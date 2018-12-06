@@ -163,11 +163,14 @@ def avg_colour(col1, col2, weight=0.5):
     return rgb2hex(*avg_rgb)
 
 USER_COLOURS = [ 
-    "#66D9EF", 
-    "#ff8000", 
-    "#1e90ff",
-    "#A6E22E", 
-    "#ff1493",
+    "#66D9EF", # light blue
+    "#ff8000", # orange
+    "#1e90ff", # blue
+    "#A6E22E", # light green
+    "#ff1493", # pink
+    "#ffff00", # yellow
+    "#f93e00", # red
+    "#de0cff", # purple
     ]
 
 def GET_USER_COLOUR(i):
