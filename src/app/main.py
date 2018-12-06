@@ -28,7 +28,14 @@ class BasicApp:
 
         if self.visible:
 
-            self.root=Tk.Tk()
+            try:
+
+                self.root=Tk.Tk()
+
+            except Tk.TclError as err:
+
+                print("TclError: {}".format(err))
+                sys.exit("Use 'python {} -n' to run in no-gui mode.".format(sys.argv[0]))
 
             # General config e.g. title
             self.root.protocol("WM_DELETE_WINDOW", self.kill )
