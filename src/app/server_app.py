@@ -47,30 +47,37 @@ class ServerApp(BasicApp):
     def poll_queue(self):
         """ Continually poll the server process queue then process each message one at a time
             in the order it was added to the server. """
+
+        if self.visible:
+
+            self.process_queue_data()
+
+            self.root.after(100, self.poll_queue)
+
+        else:
+
+            while self.socket.running:
+
+                self.process_queue_data()
+        
+                time.sleep(0.1)
+        
+        return
+
+    def process_queue_data(self):
+
         try:
 
             while True:
-                
+            
                 data = self.socket.queue.get_nowait()
-                
+                    
                 self.handle_data(data)
 
         # Break the loop when the queue is empty
         except queue.Empty:
-            pass
-
-        # Call this function in 0.1 second
-        if self.visible:    
-        
-            self.root.after(100, self.poll_queue)
-        
-        elif self.socket.running:
-        
-            time.sleep(0.1)
-        
-            self.poll_queue()
-        
-        return
+                
+            return
 
     # Handler methods
 
