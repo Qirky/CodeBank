@@ -60,6 +60,7 @@ class Server(ThreadedServer):
         self.__seed        = random.randint(0, 2048) # Force all clients to use the same seed
 
         self.clients       = [] # Client objects
+        self.address_book  = {} # All client instances that connect / disconnect
         self.users         = {} # ID: instance of User
 
         # Instantiate server process
@@ -132,18 +133,53 @@ class Server(ThreadedServer):
     def get_seed(self):
         return self.__seed
 
-    def add_new_client(self, address, socket, name):
+    def get_from_address_book(self, name, address):
         """ """
-        user_id = self.next_client_id()
-        self.clients.append( Client(user_id, address, socket, name) )
+        return self.address_book.get((name, address[0]), None)
+
+    def add_new_client(self, address, socket, name):
+        """ Creates a new client isntance and adds it to the GUI. If the name
+            is already in the address book and not connected, that user re-assumes  
+            their data """
+
+        existing_client = self.get_from_address_book(name, address)
+
+        if existing_client is not None:
+
+            if existing_client.connected:
+
+                raise LoginError("User '{}' already connected".format(name))
+
+            user_id    = existing_client.get_id()
+            new_client = existing_client.connect(socket)
+            new_client.update_address(address)
+
+        else:
+
+            user_id = self.next_client_id()
+            new_client = Client(user_id, address, socket, name)
+
+            self.add_to_address_book( new_client )
+
+        self.clients.append( new_client )
         self.app.add_user(user_id, name)
+        
         return user_id
+
+    def add_to_address_book(self, client):
+        """ Stores a client in the address book dictionary """
+        self.address_book[(client.name, client.host)] = client
+        return
 
     def remove_from_server(self, client_address):
         """ Removes the reference to this client on the server"""
         for i, client in enumerate(self.clients):
             if client_address == client.address:
+
+                client.disconnect()
+                
                 self.app.remove_user(client.id)
+                
                 del self.clients[i]
 
                 # If the user has loaded a codelet, release it
@@ -208,7 +244,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             if not self.master.authenticate(password):
 
-                return
+                raise LoginError("Failed login")
 
         self.name    = username
         self.user_id = self.master.add_new_client(self.client_address, self.request, self.name)
@@ -226,19 +262,19 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             return
 
-        if data is None:
+        except LoginError as err:
 
-            send_to_socket(self.request, MESSAGE_ERROR(-1, "Failed login."))
+            send_to_socket(self.request, MESSAGE_ERROR(-1, str(err)))
 
             print("Failed login attempt from {} - {}".format(*self.client_address))
 
             return
 
-        else:
+        # Login succesful
 
-            print("new connection from {} - {}".format(*self.client_address))
+        print("New connection from {} - {}".format(*self.client_address))
 
-            self.handle_new_connection()
+        self.handle_new_connection()
 
         # Continually read from client until disconnected
 
@@ -331,21 +367,35 @@ class Client:
     """ Keeps track of information on connected clients """
     def __init__(self, id_num, address, socket, name):
         self.address = address
+        self.host = self.address[0]
+        self.port = self.address[1]
+
         self.socket  = socket
         self.id      = id_num
         self.name    = name
 
+        self.connected = True
+
     def send(self, data):
         return send_to_socket(self.socket, data)
 
-if __name__ == "__main__":
+    def get_id(self):
+        return self.id
 
-    test = Server()
-    test.start()
+    def connect(self, new_socket):
+        self.socket    = new_socket
+        self.connected = True
+        return self
 
+    def disconnect(self):
+        self.connected = False
+        return
 
+    def update_address(self, new_address):
+        self.address = new_address
+        self.host    = self.address[0]
+        self.port    = self.address[1]
+        return
 
-
-
-
-
+class LoginError(Exception):
+    pass
