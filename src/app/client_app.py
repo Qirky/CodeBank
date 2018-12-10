@@ -430,12 +430,14 @@ class App(BasicApp):
 
     def flag_user_typing(self, flag):
         """ Sends a message to the server flagging this user as typing a new codelet """
-        
-        data = MESSAGE_TYPING(self.get_user_id(), flag)
 
-        if self.socket.is_connected():
+        if self._is_enabled:
+            
+            data = MESSAGE_TYPING(self.get_user_id(), flag)
 
-            self.socket.send(data)
+            if self.socket.is_connected():
+
+                self.socket.send(data)
 
         return
 
