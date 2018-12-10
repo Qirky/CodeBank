@@ -81,7 +81,9 @@ class Workspace(Tk.Frame):
         self.console.grid(row=0, column=0, sticky=Tk.NSEW)
         self.c_container.grid_rowconfigure(0, weight=1)
         self.c_container.grid_columnconfigure(0, weight=1)
-        
+
+        # For expanding the textbox etc
+        self.drag_mouse_down = False
 
         # Placeholders for sending data to/from the server
 
@@ -146,3 +148,39 @@ class Workspace(Tk.Frame):
     def flag_user_typing(self, *args):
         """ Send a message to the   """
         return self.parent.flag_user_typing(*args)
+
+    def drag_mouseclick(self, event=None):
+        """ Flags the mouse as clicked for drag action """
+        self.drag_mouse_down = True
+        self.grid_propagate(False)
+        return
+
+    def drag_mouserelease(self, event=None):
+        """ Flags the mouse has been released and gives focus to the app.text if it exists """
+        self.drag_mouse_down = False
+        
+        if self.text is not None:
+        
+            self.text.focus_set()
+        
+        return
+
+    def drag_mousedrag(self, event=None):
+        """ Resizes the canvas and listbox """
+
+        if self.drag_mouse_down:
+
+            delta = (self.commands.winfo_rooty() - event.y_root)
+
+            # Increase private space
+
+            self.config(height=self.winfo_height() + delta)
+
+            # Decrease public space
+
+            self.parent.sharedspace.peer_box.config(height=self.parent.sharedspace.peer_box.winfo_height() - delta)
+            self.parent.sharedspace.canvas.config(height=self.parent.sharedspace.canvas.winfo_height() - delta)
+
+            self.parent.root.update_idletasks()
+
+        return "break"

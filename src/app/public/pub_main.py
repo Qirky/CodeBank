@@ -31,9 +31,8 @@ class SharedSpace(Tk.Frame):
                 scrollregion=self.canvas.bbox(Tk.ALL)
                 )
 
-            # Box for changing size - self.parent.root
 
-            self.drag = Tk.Frame( self, bg="white", width=5, cursor="sb_h_double_arrow") # why does it need to be parent.root?
+            self.drag = Tk.Frame(self, bg="white", width=5, cursor="sb_h_double_arrow")
             self.drag.bind("<Button-1>",        self.drag_mouseclick)        
             self.drag.bind("<ButtonRelease-1>", self.drag_mouserelease)
             self.drag.bind("<B1-Motion>",       self.drag_mousedrag)

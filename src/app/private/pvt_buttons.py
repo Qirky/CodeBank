@@ -6,8 +6,9 @@ class CommandButtons(Tk.Frame):
     def __init__(self, parent, commands):
         
         Tk.Frame.__init__(self, parent)
-        self.config(width=5, height=25)
+        self.config(width=5, height=25, cursor="sb_v_double_arrow")
 
+        self.parent = parent
         self.commands = commands
 
         self.buttons = {}
@@ -15,9 +16,15 @@ class CommandButtons(Tk.Frame):
 
         for cmd in self.commands:
 
-            self.buttons[cmd.name] = Button(self, cmd)
+            self.buttons[cmd.name] = Button(self, cmd, cursor="hand2")
             self.buttons[cmd.name].grid(row=0, column=self.num_buttons, padx=4)
             self.num_buttons += 1
+
+        self.bind("<Double-Button-1>", self.parent.drag_mouseclick)
+        self.bind("<ButtonRelease-1>", self.parent.drag_mouserelease)
+        self.bind("<B1-Motion>",       self.parent.drag_mousedrag)
+
+        self.unbind("<Button-1>")
 
         self.set_to_equal_size() # better or not?
 
