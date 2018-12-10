@@ -214,5 +214,5 @@ class BasicApp:
         return self._mouse_in_codebox_flag
 
     def set_mouse_in_codebox(self, active):
-        self.root._mouse_in_codebox_flag = bool(active)
+        self._mouse_in_codebox_flag = bool(active)
         return
