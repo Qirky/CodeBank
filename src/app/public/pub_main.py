@@ -82,7 +82,7 @@ class SharedSpace(Tk.Frame):
     def _thread_safe_redraw(self):
         """ Canvas redraw functions to be called without race conditions """
         self.canvas.redraw()
-        self.canvas.config(scrollregion=self.canvas.bbox(Tk.ALL))
+        self.canvas.config(scrollregion=self.canvas.get_scrollable_region())
         return
 
     def poll_queue(self):
@@ -132,6 +132,11 @@ class SharedSpace(Tk.Frame):
 
         return
 
+    def is_scrollable(self):
+        """ Returns True if the canvas get_height() - height of codeboxes - is greater than
+            the height of the widget itself, i.e. should be scrollable."""
+        return self.canvas.get_height() > self.canvas.winfo_height()
+
 
 class MouseScroll:
     def __init__(self, parent):
@@ -141,5 +146,6 @@ class MouseScroll:
             return 1 
         return -1
     def __call__(self, event):
-        delta = self.delta(event)
-        self.parent.canvas.yview_scroll(delta, "units")
+        if self.parent.is_scrollable():
+            delta = self.delta(event)
+            self.parent.canvas.yview_scroll(delta, "units")

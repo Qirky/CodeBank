@@ -3,13 +3,18 @@ from __future__ import absolute_import, print_function
 from ..tkimport import Tk
 
 class SharedCanvas(Tk.Canvas):
+    tag_visible = "visible"
+    tag_hidden  = "hidden"
     def __init__(self, parent, *args, **kwargs):
         self.parent = parent
         Tk.Canvas.__init__(self, self.parent, **kwargs)
         self._switch_view_hidden = False
         self.codeboxes = []
+        
         self.padx = 10
         self.pady = 10
+
+        self._scrollable_region = None
 
         self.bind("<Configure>", lambda e: self.parent.redraw())
 
@@ -42,11 +47,38 @@ class SharedCanvas(Tk.Canvas):
                 # Re-draw
                 w, h = codebox.draw(self.padx, self.pady + y)
                 y = y + h + self.pady
+
+        # Update the scrollable region when re-drawing
+
+        bbox = self.bbox(Tk.ALL)
+
+        if bbox is not None:
+
+            # Add padding to scrollable region
+
+            x1, y1, x2, y2 = bbox
+
+            self._scrollable_region = (x1, y1 - self.pady, x2, y2 + self.pady)
+
+        else:
+
+            self._scrollable_region = None
                 
         return
 
     def get_width(self):
         return self.winfo_width() - self.padx
+
+    def get_height(self):
+        bbox = self._scrollable_region
+        if bbox is None:
+            height = self.winfo_height()
+        else:
+            height = bbox[3] - bbox[1]
+        return height
+
+    def get_scrollable_region(self):
+        return self._scrollable_region
 
     def get_visible_area(self, event=None):
         x1 = self.canvasx(0)

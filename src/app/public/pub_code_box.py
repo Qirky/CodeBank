@@ -122,18 +122,11 @@ class CodeBox:
 
         # Add callback bindings
 
-        try:
+        for item in (self.id, self.bg):
 
-            for item in (self.id, self.bg):
-
-                self.parent.canvas.tag_bind(item, "<ButtonPress-1>", self.on_click)
-                self.parent.canvas.tag_bind(item, "<Enter>", self.on_enter)
-                self.parent.canvas.tag_bind(item, "<Leave>", self.on_leave)
-
-        except Tk.TclError as e:
-
-            print("BG: {}, ID: {}".format(self.bg, self.id))
-            raise(e)
+            self.parent.canvas.tag_bind(item, "<ButtonPress-1>", self.on_click)
+            self.parent.canvas.tag_bind(item, "<Enter>", self.on_enter)
+            self.parent.canvas.tag_bind(item, "<Leave>", self.on_leave)
         
         return width, height
 
