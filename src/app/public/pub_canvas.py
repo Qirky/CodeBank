@@ -3,8 +3,6 @@ from __future__ import absolute_import, print_function
 from ..tkimport import Tk
 
 class SharedCanvas(Tk.Canvas):
-    tag_visible = "visible"
-    tag_hidden  = "hidden"
     def __init__(self, parent, *args, **kwargs):
         self.parent = parent
         Tk.Canvas.__init__(self, self.parent, **kwargs)

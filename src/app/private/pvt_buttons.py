@@ -20,11 +20,9 @@ class CommandButtons(Tk.Frame):
             self.buttons[cmd.name].grid(row=0, column=self.num_buttons, padx=4)
             self.num_buttons += 1
 
-        self.bind("<Double-Button-1>", self.parent.drag_mouseclick)
+        self.bind("<Button-1>",        self.parent.drag_mouseclick)
         self.bind("<ButtonRelease-1>", self.parent.drag_mouserelease)
         self.bind("<B1-Motion>",       self.parent.drag_mousedrag)
-
-        self.unbind("<Button-1>")
 
         self.set_to_equal_size() # better or not?
 

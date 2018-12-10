@@ -152,21 +152,23 @@ class Workspace(Tk.Frame):
     def drag_mouseclick(self, event=None):
         """ Flags the mouse as clicked for drag action """
         self.drag_mouse_down = True
+        # self.grid_propagate(False)
+
         self.grid_propagate(False)
+        self.parent.sharedspace.grid_propagate(False)
         return
 
     def drag_mouserelease(self, event=None):
-        """ Flags the mouse has been released and gives focus to the app.text if it exists """
+        """ Flags the mouse has been released and gives focus to the text """
         self.drag_mouse_down = False
-        
-        if self.text is not None:
-        
-            self.text.focus_set()
-        
+
+        self.grid_propagate(True)
+        self.parent.sharedspace.grid_propagate(True)
+        self.text.focus_set()
         return
 
     def drag_mousedrag(self, event=None):
-        """ Resizes the canvas and listbox """
+        """ Resizes the private workspace """
 
         if self.drag_mouse_down:
 
@@ -178,8 +180,7 @@ class Workspace(Tk.Frame):
 
             # Decrease public space
 
-            self.parent.sharedspace.peer_box.config(height=self.parent.sharedspace.peer_box.winfo_height() - delta)
-            self.parent.sharedspace.canvas.config(height=self.parent.sharedspace.canvas.winfo_height() - delta)
+            self.parent.sharedspace.config(height=self.parent.sharedspace.winfo_height() - delta)
 
             self.parent.root.update_idletasks()
 
