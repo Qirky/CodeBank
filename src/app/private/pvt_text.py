@@ -39,6 +39,7 @@ class TextInput(Tk.Text):
 
         self.bind("<Key>",       self.keypress)
         self.bind("<Return>",    self.return_key)
+        self.bind("<Delete>",    self.delete_key)
         self.bind("<Escape>",    lambda *e: self.root.reset_program_state())
 
         # Over-ride Key binding for undo/redo shortcuts : TODO - add to Menu
@@ -134,6 +135,13 @@ class TextInput(Tk.Text):
             return "break"
         return
 
+    def delete_key(self, event=None):
+        """ If a codelet is highlighted, use HIDE, if not, just use the return Key"""
+        if self.root.highlighted_codelet != NULL and (not self.root.mouse_in_codebox()):
+            self.root.send_hide_codelet(self.root.highlighted_codelet)
+            self.root.unhighlight_all_codelets()
+            return "break"
+        return
 
     def highlight(self):
         """ Highlights a chunk of text and schedules it to un-highlight 150ms later """
