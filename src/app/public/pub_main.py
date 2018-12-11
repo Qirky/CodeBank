@@ -56,12 +56,17 @@ class SharedSpace(Tk.Frame):
             self.grid_rowconfigure(0, weight=1)
 
             # Grid
+
+            self.padding = Tk.Frame(self, bg="white", width=5)
             
             self.canvas.grid(row=0, column=0, sticky=Tk.NSEW)
             self.drag.grid(row=0, column=1, sticky=Tk.NSEW)
             self.peer_box.grid(row=0, column=2, sticky=Tk.NSEW)
             self.peer_box.grid_propagate(False) # this is interesting
-            self.y_scroll.grid(row=0, column=3, sticky=Tk.NSEW)
+            self.padding.grid(row=0, column=3, sticky=Tk.NSEW)
+            self.y_scroll.grid(row=0, column=4, sticky=Tk.NSEW)
+
+
 
             # Thread safe redraw queue
             self.queue = queue.Queue()

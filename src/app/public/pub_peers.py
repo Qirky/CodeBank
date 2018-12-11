@@ -13,24 +13,27 @@ class PeerBox(Tk.Frame):
     
         Tk.Frame.__init__(self, self.parent, width=350)
 
+        self.padding = Tk.Frame(self, bg="white", height=5)
+        self.padding.grid(row=0, column=0, stick=Tk.NSEW)
+
         # Peers
 
         self.listbox = Tk.Canvas(self, bg="White", width=20)
         
-        self.listbox.grid(row=0, column=0, sticky=Tk.NSEW)
+        self.listbox.grid(row=1, column=0, sticky=Tk.NSEW)
 
         self.listbox.bind("<Button-1>", lambda e: "break")
         self.listbox.bind("<B1-Motion>", lambda e: "break")
 
         # Chat
 
-        self.chatbox = Tk.Text(self, bg="White", font=self.app.font, height=10, width=5, bd=1, relief=Tk.GROOVE)
-        self.chatbox.grid(row=1, column=0, sticky=Tk.NSEW)
+        self.chatbox = Tk.Text(self, bg="White", font=self.app.font, height=10, width=5, bd=1, relief=Tk.FLAT)
+        self.chatbox.grid(row=2, column=0, sticky=Tk.NSEW)
         self.chatbox.bind("<Key>", lambda e: "break")
         self.num_messages = 0
 
-        self.rowconfigure(0, weight=1) # Expand
-        self.rowconfigure(1, weight=1) 
+        self.rowconfigure(1, weight=1) # Expand
+        self.rowconfigure(2, weight=1) 
         self.columnconfigure(0, weight=1)
 
 
