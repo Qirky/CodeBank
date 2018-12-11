@@ -12,6 +12,8 @@ class Workspace(Tk.Frame):
         Tk.Frame.__init__(self, parent.root)
         
         self.parent = parent
+        self.font   = self.parent.font
+
         self.config(height=100)
 
         # Buttons
@@ -31,7 +33,7 @@ class Workspace(Tk.Frame):
 
         self.container = Tk.Frame(self, height=250, width=0)
 
-        self.text = TextInput(self.container, main=self, font=self.parent.font)
+        self.text = TextInput(self.container, main=self, font=self.font)
 
         self.text.bind("<{}-Return>".format(CONTROL_KEY),       self.evaluate_code_locally)
         self.text.bind("<{}-Shift-Return>".format(CONTROL_KEY), self.push_code_to_remote)
@@ -47,7 +49,7 @@ class Workspace(Tk.Frame):
         # Console
 
         self.c_container = Tk.Frame(self, bg="gray")
-        self.console = Console(self.c_container, font=self.parent.font)
+        self.console = Console(self.c_container, font=self.font)
 
         sys.stdout = self.console # routes stdout to print to console
 
@@ -92,7 +94,7 @@ class Workspace(Tk.Frame):
     # Methods for connecting and sending data to sockets
 
     def set_connection(self, conn):
-        """ Connects to the remote and imports foxdot """
+        """ Connects to the remote """
         self.socket = conn
         return
 
@@ -109,6 +111,18 @@ class Workspace(Tk.Frame):
         self.parent.set_codelet_id(codelet_id)
         self.text.set_text(codelet.get_text().strip())
         self.commands.enable_all()
+        return
+
+    def disable(self):
+        self.text.config(state=Tk.DISABLED, bg="#b3b3b3")
+        self.commands.disable_all()
+        self.commands.disable_chat()
+        return
+
+    def enable(self):
+        self.text.config(state=Tk.NORMAL, bg="white")
+        self.commands.default_all()
+        self.commands.enable_chat()
         return
 
     # Methods for running code
@@ -146,14 +160,14 @@ class Workspace(Tk.Frame):
         return "break"
 
     def flag_user_typing(self, *args):
-        """ Send a message to the   """
         return self.parent.flag_user_typing(*args)
+
+    def send_chat_message(self, *args):
+        return self.parent.send_chat_message(*args)
 
     def drag_mouseclick(self, event=None):
         """ Flags the mouse as clicked for drag action """
         self.drag_mouse_down = True
-        # self.grid_propagate(False)
-
         self.grid_propagate(False)
         self.parent.sharedspace.grid_propagate(False)
         return
@@ -161,9 +175,8 @@ class Workspace(Tk.Frame):
     def drag_mouserelease(self, event=None):
         """ Flags the mouse has been released and gives focus to the text """
         self.drag_mouse_down = False
-
-        self.grid_propagate(True)
-        self.parent.sharedspace.grid_propagate(True)
+        # self.grid_propagate(True)
+        # self.parent.sharedspace.grid_propagate(True)
         self.text.focus_set()
         return
 

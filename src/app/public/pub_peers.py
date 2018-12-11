@@ -8,10 +8,12 @@ class PeerBox(Tk.Frame):
 
         self.parent = parent # Is the "SharedSpace"
         self.app    = parent.parent # is the whole app
-    
-        Tk.Frame.__init__(self, self.parent, width=250)
 
-        # self.listbox = Tk.Listbox(self, bg="White", font=self.parent.parent.font, width=20)
+        self.font = self.app.font
+    
+        Tk.Frame.__init__(self, self.parent, width=350)
+
+        # Peers
 
         self.listbox = Tk.Canvas(self, bg="White", width=20)
         
@@ -20,8 +22,17 @@ class PeerBox(Tk.Frame):
         self.listbox.bind("<Button-1>", lambda e: "break")
         self.listbox.bind("<B1-Motion>", lambda e: "break")
 
+        # Chat
+
+        self.chatbox = Tk.Text(self, bg="White", font=self.app.font, height=10, width=5, bd=1, relief=Tk.GROOVE)
+        self.chatbox.grid(row=1, column=0, sticky=Tk.NSEW)
+        self.chatbox.bind("<Key>", lambda e: "break")
+        self.num_messages = 0
+
         self.rowconfigure(0, weight=1) # Expand
+        self.rowconfigure(1, weight=1) 
         self.columnconfigure(0, weight=1)
+
 
         # Use app font
 
@@ -29,8 +40,6 @@ class PeerBox(Tk.Frame):
         self.pady = 2
 
         self.box_height = 0
-
-        self.font = self.app.font
 
         self.colours = ["#565656", "#7f7f7f", "#7f7f7f"]
 
@@ -68,6 +77,16 @@ class PeerBox(Tk.Frame):
             self.after(500, lambda: self.refresh(internal_call=True))
 
         return 
+
+    def add_chat_message(self, user, message):
+        self.chatbox.tag_config(user.tag(), foreground=user.get_colour())
+        if self.num_messages > 0:
+            self.chatbox.insert(Tk.INSERT, "\n")
+        self.chatbox.insert(Tk.INSERT, user.get_name(), user.tag())
+        self.chatbox.insert(Tk.INSERT, ": {}".format(message))
+        self.chatbox.see(Tk.END)
+        self.num_messages += 1
+        return
 
     def draw_user_box(self, y_pos, user):
         # Draw text

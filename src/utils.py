@@ -43,6 +43,7 @@ HANDLE_HIDE     = 15
 HANDLE_SHUTDOWN = 16
 HANDLE_SEED     = 17
 HANDLE_TYPING   = 18
+HANDLE_CHAT     = 19
 
 def MESSAGE_KILL(user_id):
     return [HANDLE_KILL, user_id]
@@ -91,6 +92,9 @@ def MESSAGE_SEED(user_id=-1, seed=0):
 
 def MESSAGE_TYPING(user_id, flag):
     return [HANDLE_TYPING, int(user_id), int(flag)]
+
+def MESSAGE_CHAT(user_id, message):
+    return [HANDLE_CHAT, user_id, str(message)]
 
 # Special case codelet IDs
 

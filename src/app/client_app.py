@@ -14,7 +14,7 @@ class App(BasicApp):
         try:
 
             self.root.state("zoomed")
-
+            
         except Tk.TclError:
 
             pass
@@ -52,6 +52,7 @@ class App(BasicApp):
             HANDLE_HISTORY  : self.load_codelet_history,
             HANDLE_SHUTDOWN : self.shutdown_from_server,
             HANDLE_SEED     : self.update_random_seed,
+            HANDLE_CHAT     : self.receive_chat_message,
         }
 
         # This stores the codelet being currently edited
@@ -118,20 +119,23 @@ class App(BasicApp):
     def disable(self):
         """ Stop textbox and buttons from being used """
         self._is_enabled = False
-        self.workspace.text.config(state=Tk.DISABLED, bg="#b3b3b3")
         self.root.title("CodeBank Client: Not Connected")
-        self.workspace.commands.disable_all()
+
+        self.workspace.disable()
+        
         # Dissalow codelets to be highlighted
         self.codelet_on_click = lambda *args, **kwargs: None
         self.disable_codelet_highlight = lambda *args, **kwargs: True
+        
         return
 
     def enable(self):
         """ Allows textbox and buttons being used """ # 
         self._is_enabled = True
-        self.workspace.text.config(state=Tk.NORMAL, bg="white")
         self.root.title("CodeBank Client. Logged in as {}".format(self.get_client_name()))
-        self.workspace.commands.default_all()
+
+        self.workspace.enable()
+
         # Allow clicking
         self.codelet_on_click = self.request_codelet
         self.disable_codelet_highlight = self.is_editing_codelet
@@ -434,6 +438,18 @@ class App(BasicApp):
         if self._is_enabled:
             
             data = MESSAGE_TYPING(self.get_user_id(), flag)
+
+            if self.socket.is_connected():
+
+                self.socket.send(data)
+
+        return
+
+    def send_chat_message(self, message):
+        """ Send a chat message to the server """
+        if self._is_enabled:
+
+            data = MESSAGE_CHAT(self.get_user_id(), message)
 
             if self.socket.is_connected():
 

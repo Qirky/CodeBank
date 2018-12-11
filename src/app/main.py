@@ -165,6 +165,12 @@ class BasicApp:
         self.evaluate("RandomGenerator.set_override_seed({})".format(seed), verbose=False)
         return
 
+    def receive_chat_message(self, user_id, message):
+        """ Handler for getting a chat message, displays in the sharedspace chat widget """
+        # print("Message from '{}': {}".format(user_name, message))
+        self.sharedspace.add_new_chat_message(user_id, message)
+        return
+
     def get_codelets(self):
         """ Returns the list of code-box abstractions of the stored codelets  """
         return self.sharedspace.codelets.values()

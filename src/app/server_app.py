@@ -22,6 +22,7 @@ class ServerApp(BasicApp):
             HANDLE_RELEASE : self.handle_release_codelet,
             HANDLE_TYPING  : self.handle_set_user_typing,
             HANDLE_REMOVE  : self.remove_user,
+            HANDLE_CHAT    : self.receive_chat_message,
         }
 
         # Poll the parent queue
@@ -179,4 +180,10 @@ class ServerApp(BasicApp):
         """ Flags a user as typing then forward to all other connected users """
         BasicApp.set_user_typing(self, user_id, flag)
         self.socket.send_to_all(MESSAGE_TYPING(user_id, flag))
+        return
+
+    def receive_chat_message(self, user_id, message):
+        """ Forward chat messages """
+        BasicApp.receive_chat_message(self, user_id, message)
+        self.socket.send_to_all(MESSAGE_CHAT(user_id, message))
         return

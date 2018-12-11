@@ -106,6 +106,7 @@ class User:
         self.codelet_id = None
         self.is_typing = False
         self.colour = GET_USER_COLOUR(self.id)
+        self.text_tag = "text_tag_{}".format(self.id)
 
     def __repr__(self):
         return self.name
@@ -115,6 +116,9 @@ class User:
 
     def get_colour(self):
         return self.colour
+
+    def tag(self):
+        return self.text_tag
 
     def get_is_typing(self):
         return self.is_typing

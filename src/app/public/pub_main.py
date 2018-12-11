@@ -136,6 +136,13 @@ class SharedSpace(Tk.Frame):
             the height of the widget itself, i.e. should be scrollable."""
         return self.canvas.get_height() > self.canvas.winfo_height()
 
+    def add_new_chat_message(self, user_id, message):
+        """ Gets the user object and triggers new message """
+        if self.parent.visible:
+            user = self.parent.users[user_id]
+            self.peer_box.add_chat_message(user, message)
+        return
+
 
 class MouseScroll:
     def __init__(self, parent):
