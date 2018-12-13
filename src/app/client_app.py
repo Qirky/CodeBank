@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function
 
 from .main import *
 from .connection_input import popup_window
+from .clock_nudge import ClockNudgePopup
 from ..utils import get_players, NULL, CONTROL_KEY
 
 # Class for interface for client-side
@@ -24,7 +25,12 @@ class App(BasicApp):
         self.menu = MenuBar(self)
         self.root.config(menu=self.menu)
         self.root.bind("<{}-n>".format(CONTROL_KEY), self.init_connection)
+        self.root.bind("<{}-k>".format(CONTROL_KEY), self.show_clock_nudge_popup)
+        
         self.popup_open = False
+        
+        self.nudge_popup_open = False
+        self.nudge = 0
 
         # Lower text box for client text entry
 
@@ -114,6 +120,35 @@ class App(BasicApp):
 
             self.popup_open = False
             
+        return
+
+    def get_clock_nudge_value(self):
+
+        self.nudge_popop_open = True
+
+        self.nudge_popup = ClockNudgePopup(self)
+
+        # Put the popup on top
+        
+        self.root.wait_window(self.nudge_popup.top)
+
+        return self.nudge_popup.value
+
+    def show_clock_nudge_popup(self, event=None):
+        """ Shows a popup that allows the user to change the "nudge" value for the clock """
+
+        if self.socket.is_connected() and self.nudge_popup_open is False:
+
+            nudge = self.get_clock_nudge_value()
+
+            self.nudge_popup_open = False
+
+            if nudge is not None:
+
+                self.nudge = nudge
+
+            self.evaluate("Clock.nudge = {}".format(self.nudge), verbose=False)
+
         return
 
     def disable(self):

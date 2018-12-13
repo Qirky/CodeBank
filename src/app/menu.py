@@ -11,6 +11,7 @@ class MenuBar(Tk.Menu):
 
         filemenu =  Tk.Menu(self, tearoff=0)
         filemenu.add_command(label="Connect to server", command=self.parent.init_connection, accelerator="Ctrl+N")
+        filemenu.add_command(label="Adjust clock nudge", command=self.parent.show_clock_nudge_popup, accelerator="Ctrl+K")
         self.add_cascade(label="File", menu=filemenu)        
 
         editmenu = Tk.Menu(self, tearoff=0)
