@@ -39,6 +39,7 @@ class BasicApp:
 
             # General config e.g. title
             self.root.protocol("WM_DELETE_WINDOW", self.kill )
+            self.root.geometry("1440x720") # default size
 
             self.default_font = 'Consolas'
 
@@ -200,12 +201,14 @@ class BasicApp:
         font = tkFont.nametofont("CodeFont")
         size = min(font.actual()["size"]+2, 28)
         font.configure(size=size)
+        self.sharedspace.redraw()
         return "break"
 
     def decrease_font_size(self, event=None):
         font = tkFont.nametofont("CodeFont")
         size = max(font.actual()["size"]-2, 8)
         font.configure(size=size)
+        self.sharedspace.redraw()
         return "break"
 
     # Override

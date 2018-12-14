@@ -24,11 +24,10 @@ class App(BasicApp):
 
         self.menu = MenuBar(self)
         self.root.config(menu=self.menu)
-        self.root.bind("<{}-n>".format(CONTROL_KEY), self.init_connection)
-        self.root.bind("<{}-k>".format(CONTROL_KEY), self.show_clock_nudge_popup)
-        
+
+        # Popup information
+
         self.popup_open = False
-        
         self.nudge_popup_open = False
         self.nudge = 0
 
@@ -68,6 +67,10 @@ class App(BasicApp):
 
         self.sharedspace.canvas.bind("<Enter>", self.unhighlight_all_codelets)
         self.sharedspace.canvas.bind("<Leave>", self.unhighlight_all_codelets)
+
+        # Keyboard bindings
+
+        self.root.bind("<{}-n>".format(CONTROL_KEY), self.init_connection)
 
         # Boolean flags
 
@@ -124,12 +127,8 @@ class App(BasicApp):
 
     def get_clock_nudge_value(self):
 
-        self.nudge_popop_open = True
-
         self.nudge_popup = ClockNudgePopup(self)
-
-        # Put the popup on top
-        
+        self.nudge_popup.display.focus_set()
         self.root.wait_window(self.nudge_popup.top)
 
         return self.nudge_popup.value
@@ -139,15 +138,17 @@ class App(BasicApp):
 
         if self.socket.is_connected() and self.nudge_popup_open is False:
 
-            nudge = self.get_clock_nudge_value()
+            self.nudge_popop_open = True
 
-            self.nudge_popup_open = False
+            nudge = self.get_clock_nudge_value()
 
             if nudge is not None:
 
                 self.nudge = nudge
 
             self.evaluate("Clock.nudge = {}".format(self.nudge), verbose=False)
+
+            self.nudge_popup_open = False
 
         return
 

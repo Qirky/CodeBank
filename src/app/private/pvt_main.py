@@ -41,6 +41,8 @@ class Workspace(Tk.Frame):
         self.text.bind("<{}-equal>".format(CONTROL_KEY), self.parent.increase_font_size)
         self.text.bind("<{}-minus>".format(CONTROL_KEY), self.parent.decrease_font_size)
 
+        self.text.bind("<{}-k>".format(CONTROL_KEY), self.parent.show_clock_nudge_popup)
+
         # Canvas bindings
 
         self.text.bind("<Alt-Up>", self.parent.highlight_codelet_up)
@@ -65,12 +67,12 @@ class Workspace(Tk.Frame):
         self.commands.grid(row=0, column=0, sticky=Tk.NSEW, columnspan=2)
         self.y_scroll.grid(row=0, column=2, sticky=Tk.NSEW, rowspan=2)
         
-        self.grid_rowconfigure(0, weight=0) # buttons
-        self.grid_rowconfigure(1, weight=1) # text
+        self.grid_rowconfigure(0, weight=0) # buttons - Do not expand
+        self.grid_rowconfigure(1, weight=1) # text / console - we want this to expand
         
         self.grid_columnconfigure(0, weight=1) # text
         self.grid_columnconfigure(1, weight=1) # console
-        self.grid_columnconfigure(2, weight=0)
+        self.grid_columnconfigure(2, weight=0) # Scroll bar
         
         self.container.grid(row=1, column=0, sticky=Tk.NSEW)
         self.container.grid_propagate(False)

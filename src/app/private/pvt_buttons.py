@@ -4,9 +4,12 @@ from ..tkimport import Tk
 class CommandButtons(Tk.Frame):
     """docstring for TextInput"""
     def __init__(self, parent, commands):
-        
+
         Tk.Frame.__init__(self, parent)
-        self.config(width=5, height=25, cursor="sb_v_double_arrow")
+
+        self.height = 25
+    
+        self.config(width=5, height=self.height, cursor="sb_v_double_arrow")
 
         self.parent = parent
         self.commands = commands
@@ -26,20 +29,31 @@ class CommandButtons(Tk.Frame):
 
         # Add text for chatting
 
-        self.chat_container = Tk.Frame(self)
-        self.chat_container.grid(row=0,  column=self.num_buttons + 1, columnspan=4, sticky=Tk.NSEW)
-        self.chat_container.grid_columnconfigure(0, weight=1)
-        self.chat_container.grid_columnconfigure(1, weight=1)
-        self.chat_container.grid_rowconfigure(0, weight=1)
+        self.chat_column_span = 4
 
-        self.chat_text = Tk.Text(self.chat_container, height=1, width=50, font=self.parent.font)
+        self.chat_container = Tk.Frame(self, height=self.height)
+        self.chat_container.grid_propagate(False)
+        self.chat_container.grid(row=0, column=self.num_buttons, columnspan=self.chat_column_span, sticky=Tk.NSEW)
+
+        # Make chat box expand
+
+        self.grid_columnconfigure(self.num_buttons, weight=1)
+        self.chat_container.grid_columnconfigure(0, weight=1)
+        self.chat_container.grid_rowconfigure(0, weight=1) 
+        # self.chat_container.grid_columnconfigure(1, weight=1)
+
+        self.chat_text = Tk.Text(self.chat_container, height=1, width=20, font=self.parent.font)
         self.chat_text.grid(row=0, column=0, sticky=Tk.NSEW)
         self.chat_text.bind("<Return>", self.send_chat_message)
         self.chat_text.bind("<Escape>", lambda e: self.parent.text.focus_set())
-        
-        self.chat_send = Tk.Button(self.chat_container, text=" SEND ", cursor="hand2", command=self.send_chat_message)
-        self.chat_send.grid(row=0, column=1, sticky=Tk.NSEW)
+        self.chat_text.bind("<Tab>", lambda e: self.parent.text.focus_set())
+        self.chat_text.bind("<Home>", lambda e: self.chat_text.see("1.0"))
+        self.chat_text.bind("<End>",  lambda e: self.chat_text.see(Tk.END))
 
+        self.num_buttons += self.chat_column_span
+        
+        self.chat_send = Tk.Button(self, text=" SEND ", cursor="hand2", command=self.send_chat_message)
+        self.chat_send.grid(row=0, column=self.num_buttons, sticky=Tk.NSEW)
 
         self.set_to_equal_size() # better or not?
 
