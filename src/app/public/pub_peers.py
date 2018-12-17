@@ -27,7 +27,7 @@ class PeerBox(Tk.Frame):
 
         # Chat
 
-        self.chatbox = Tk.Text(self, bg="White", font=self.app.font, height=10, width=5, bd=1, relief=Tk.FLAT)
+        self.chatbox = Tk.Text(self, bg="White", font=self.app.font, height=10, width=5, bd=1, relief=Tk.FLAT, wrap=Tk.WORD)
         self.chatbox.grid(row=2, column=0, sticky=Tk.NSEW)
         self.chatbox.bind("<FocusIn>", lambda e: self.parent.focus())
         self.num_messages = 0
@@ -82,9 +82,14 @@ class PeerBox(Tk.Frame):
         return 
 
     def add_chat_message(self, user, message):
+        """ Adds a new message to the chat box """
+        # Configure correct colours for the user and move insert to end
         self.chatbox.tag_config(user.tag(), foreground=user.get_colour())
+        self.chatbox.mark_set(Tk.INSERT, Tk.END)
+        # Go to newline if needed
         if self.num_messages > 0:
             self.chatbox.insert(Tk.INSERT, "\n")
+        # Insert message
         self.chatbox.insert(Tk.INSERT, user.get_name(), user.tag())
         self.chatbox.insert(Tk.INSERT, ": {}".format(message))
         self.chatbox.see(Tk.END)
@@ -107,25 +112,21 @@ class PeerBox(Tk.Frame):
         bbox = [bounds[0] - self.padx, bounds[1] - self.pady, self.get_width(), bounds[3] + self.pady]
 
         rect = self.listbox.create_rectangle( bbox, fill=user.get_colour() )
-        
-        # Draw dots
-
-        dots = self.draw_dots(y_pos)
-
-        # Organise z-axis
-
-        self.listbox.tag_lower(rect, text)
 
         if user.get_is_typing():
+
+            # Draw dots
+
+            dots = self.draw_dots(y_pos)
+
+            # Move other boxes above
 
             self.listbox.tag_lower(text)
             self.listbox.tag_lower(rect)
 
         else:
 
-            for dot in dots:
-
-                self.listbox.tag_lower(dot)
+            self.listbox.tag_lower(rect, text)
 
         # Store height
 
