@@ -25,7 +25,7 @@ class Workspace(Tk.Frame):
                 CmdButton("ROLLBACK"      , self.parent.trigger_rollback, default=Tk.DISABLED),
                 CmdButton("HIDE"          , self.parent.trigger_hide_codelet),
                 CmdButton("TOGGLE HIDDEN" , self.parent.toggle_view_hidden),
-                CmdButton("CLEAR CLOCK"   , self.parent.clear_clock),
+                CmdButton("CLEAR CLOCK"   , self.parent.send_clear_clock_message),
             ]
         )
 

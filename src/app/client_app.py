@@ -58,6 +58,7 @@ class App(BasicApp):
             HANDLE_SHUTDOWN : self.shutdown_from_server,
             HANDLE_SEED     : self.update_random_seed,
             HANDLE_CHAT     : self.receive_chat_message,
+            HANDLE_CLEAR    : self.clear_clock,
         }
 
         # This stores the codelet being currently edited
@@ -438,29 +439,15 @@ class App(BasicApp):
 
         return
 
-    def clear_clock(self,  event=None):
+    def send_clear_clock_message(self,  event=None):
         """ Sends a new message to the server to clear the scheduling clock """
         if self._is_enabled:
         
-            # Get code contents and package together with information which, if any, codelet is being sent
+            data = MESSAGE_CLEAR(self.get_user_id())
 
-            if self.solo_on:
+            if self.socket.is_connected():
 
-                self.solo_local_code()
-
-            code = "Clock.clear()"
-
-            if len(code.strip()) > 0:
-
-                data = MESSAGE_PUSH(self.get_user_id(), -1, code)
-
-                if self.socket.is_connected():
-
-                    self.socket.send(data)
-
-                # Clear text and reset
-
-                self.clear()
+                self.socket.send(data)
 
     #####
 

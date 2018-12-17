@@ -23,6 +23,7 @@ class ServerApp(BasicApp):
             HANDLE_TYPING  : self.handle_set_user_typing,
             HANDLE_REMOVE  : self.remove_user,
             HANDLE_CHAT    : self.receive_chat_message,
+            HANDLE_CLEAR   : self.clear_clock,
         }
 
         # Poll the parent queue
@@ -186,4 +187,10 @@ class ServerApp(BasicApp):
         """ Forward chat messages """
         BasicApp.receive_chat_message(self, user_id, message)
         self.socket.send_to_all(MESSAGE_CHAT(user_id, message))
+        return
+
+    def clear_clock(self, user_id):
+        """ Forward clock clear messages """
+        BasicApp.clear_clock(self, user_id)
+        self.socket.send_to_all(MESSAGE_CLEAR(user_id))
         return

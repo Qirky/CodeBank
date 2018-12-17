@@ -168,8 +168,13 @@ class BasicApp:
 
     def receive_chat_message(self, user_id, message):
         """ Handler for getting a chat message, displays in the sharedspace chat widget """
-        # print("Message from '{}': {}".format(user_name, message))
         self.sharedspace.add_new_chat_message(user_id, message)
+        return
+
+    def clear_clock(self, user_id):
+        """ Silently stops clock and prints message with user ID """
+        self.evaluate("Clock.clear()")
+        print("{} has cleared the clock.".format(self.get_user_name(user_id)))
         return
 
     def get_codelets(self):
