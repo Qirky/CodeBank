@@ -42,11 +42,11 @@ class CommandButtons(Tk.Frame):
         self.chat_container.grid_rowconfigure(0, weight=1) 
         # self.chat_container.grid_columnconfigure(1, weight=1)
 
-        self.chat_text = Tk.Text(self.chat_container, height=1, width=20, font=self.parent.font)
+        self.chat_text = Tk.Text(self.chat_container, height=1, width=20, font=self.parent.font, wrap=Tk.NONE)
         self.chat_text.grid(row=0, column=0, sticky=Tk.NSEW)
         self.chat_text.bind("<Return>", self.send_chat_message)
         self.chat_text.bind("<Escape>", lambda e: self.parent.text.focus_set())
-        self.chat_text.bind("<Tab>", lambda e: self.parent.text.focus_set())
+        self.chat_text.bind("<Tab>",  self.key_tab)
         self.chat_text.bind("<Home>", lambda e: self.chat_text.see("1.0"))
         self.chat_text.bind("<End>",  lambda e: self.chat_text.see(Tk.END))
 
@@ -81,6 +81,8 @@ class CommandButtons(Tk.Frame):
             button.set_to_default()
         return
 
+    # Chat messages
+
     def disable_chat(self):
         self.chat_text.config(state=Tk.DISABLED, bg="#b3b3b3")
         self.chat_send.config(state=Tk.DISABLED)
@@ -96,6 +98,11 @@ class CommandButtons(Tk.Frame):
         if len(text):
             self.chat_text.delete("1.0", Tk.END)
             self.parent.send_chat_message(text)
+        return "break"
+
+    def key_tab(self, event=None):
+        """ Moves focus to the main text box """
+        self.parent.text.focus_set()
         return "break"
 
 class Button(Tk.Button):
