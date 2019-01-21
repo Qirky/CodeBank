@@ -107,10 +107,12 @@ class User:
     def __init__(self, id_num, name):
         self.id = int(id_num)
         self.name = name
-        self.codelet_id = None
+        self.codelet_id = NULL
         self.is_typing = False
         self.colour = GET_USER_COLOUR(self.id)
         self.text_tag = "text_tag_{}".format(self.id)
+
+        self.last_monitored_code = None
         self.is_monitored = False
         self.monitoring = []
 
@@ -131,7 +133,7 @@ class User:
 
     # Unnecessary?
     def get_codelet_id(self):
-        return
+        return self.codelet_id
 
     def get_is_monitored(self):
         return self.is_monitored
@@ -147,11 +149,18 @@ class User:
         if user_id in self.monitoring:
             self.monitoring.remove(user_id)
 
+    def monitor_evaluate(self, text):
+        self.last_monitored_code = text
+
+    def get_last_monitored_code(self):
+        return self.last_monitored_code
+
     def start_monitoring(self):
         self.is_monitored = True
 
     def stop_monitoring(self):
         self.is_monitored = False
+        self.last_monitored_code = None
 
     def set_is_typing(self, flag):
         self.is_typing = bool(flag)

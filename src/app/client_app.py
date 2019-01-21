@@ -319,41 +319,6 @@ class App(BasicApp):
                     banned.append(match.group(1))
         return banned
 
-    def reset_program_state(self, event=None):
-        """ Resets the program state to before the last push, triggered by the RESET button """
-
-        if self._is_enabled:
-
-            if self.solo_on:
-
-                self.solo_local_code()
-
-            code = self.workspace.text.get_text()
-
-            players = get_players(code)
-
-            for player in players:
-
-                code = "{}.reset()".format(player) # TODO // get code from Interpreter
-
-                self.send_monitored_code(code)
-
-                self.evaluate(code)
-
-            # e.g. r1.reset() then eval the history of the codelet?
-
-            codelet_id = self.get_codelet_id()
-
-            if codelet_id != NULL:
-
-                codelet = self.sharedspace.codelets[codelet_id].get_codelet()
-
-                self.evaluate_codelet_history(codelet)
-
-            self.clear() # sends data to server
-
-        return
-
     def trigger_rollback(self, event=None):
         """ Resets the players and deletes the last commit to the current codelet. """
         if self._is_enabled:
@@ -506,6 +471,8 @@ class App(BasicApp):
             self.workspace.load_from_codelet(codelet_id)
         
         # Flag it to be grey and redraw
+
+        self.socket.users[user_id].assign_codelet(codelet_id)
         
         self.sharedspace.codelets[codelet_id].assign_editor(user_id)
         
@@ -573,6 +540,8 @@ class App(BasicApp):
 
         # Evaluate the code
 
+        self.socket.users[user_id].clear_codelet() # no longer editing
+
         self.workspace.console.insert_user_update(self.socket.users[user_id], update_text)
 
         self.evaluate_codelet(codelet)
@@ -582,28 +551,80 @@ class App(BasicApp):
     def start_monitoring_user(self, user):
         """ Called from public list box widget - flags a user as being monitored """
         self.workspace.console.insert_user_update(user, "is now being monitored")
-        user.start_monitoring()
         self.socket.send(MESSAGE_MONITOR_START(self.get_user_id(), user.id))
-        return
+        return user.start_monitoring()
 
     def stop_monitoring_user(self, user):
         """ Called from public list box widget - flags a user as not being monitored """
         self.workspace.console.insert_user_update(user, "is no longer being monitored")
-        user.stop_monitoring()
         self.socket.send(MESSAGE_MONITOR_STOP(self.get_user_id(), user.id))
-        return
+        # Reset the codelet if being edited
+        last_evaluated_code = user.get_last_monitored_code()
+        if last_evaluated_code is not None:
+            reset_code = self.get_reset_code(last_evaluated_code, user.get_codelet_id())
+            self.evaluate(reset_code)
+        return user.stop_monitoring()
 
     def evaluate_monitored_user(self, user_id, string):
         """ If a user is being monitored, then this method is called to evaluate their code """
-        self.workspace.console.insert_user_update(self.socket.users[user_id], "(monitored) has evaluated:")
-        self.evaluate(string)
+        user = self.socket.users[user_id]
+        if user.get_is_monitored():
+            self.workspace.console.insert_user_update(self.socket.users[user_id], "(monitored) has evaluated:")
+            self.evaluate(string)
+            user.monitor_evaluate(string) # store the last bit of code evaluated
+        return
+
+    def get_reset_code(self, working_code, codelet_id):
+        
+        reset_code = []
+
+        if codelet_id == NULL:
+
+            codelet = None
+            func = "stop"
+
+        else:
+
+            codelet = self.sharedspace.codelets[codelet_id].get_codelet()
+            func    = "reset"
+
+        # TODO // get code from Interpreter
+
+        players = get_players(working_code)
+
+        for player in players:
+            
+            reset_code.append("{}.{}()".format(player, func))
+
+        if codelet is not None:
+
+            reset_code.append(codelet.get_text())
+
+        return "\n".join(reset_code)
+
+    def reset_program_state(self, event=None):
+        """ Resets the program state to before the last push, triggered by the RESET button """
+
+        if self._is_enabled:
+
+            if self.solo_on:
+
+                self.solo_local_code()
+
+            reset_code = self.get_reset_code(self.workspace.text.get_text(), self.get_codelet_id())
+
+            self.evaluate(reset_code)
+
+            self.send_monitored_code(reset_code)
+
+            self.clear() # sends data to server to release codelet
+
         return
 
     def hide_codelet(self, user_id, codelet_id):
         """ Labels the codelet as hidden """
         self.get_codelet(codelet_id).hide()
         self.sharedspace.redraw()
-        # print("User '{}' hiding codelet id. {}".format(self.get_user_name(user_id), codelet_id))
         self.workspace.console.insert_user_update(self.socket.users[user_id], "is hiding codelet id. {}".format(codelet_id))
         return
 
@@ -621,7 +642,6 @@ class App(BasicApp):
     def clear_clock(self, user_id):
         """ Silently stops clock and prints message with user ID """
         BasicApp.clear_clock(self)
-        # print("{} has cleared the clock.".format(self.get_user_name(user_id)))
         self.workspace.console.insert_user_update(self.socket.users[user_id], "has cleard the clock")
         return
 
@@ -631,7 +651,6 @@ class App(BasicApp):
         return
 
     def remove_user(self, user_id):
-        # print("User  '{}' has disconnected.".format(self.get_user_name(user_id)))
         self.workspace.console.insert_user_update(self.socket.users[user_id], "has disconnected")
         BasicApp.remove_user(self, user_id)
         return

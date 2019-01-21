@@ -66,8 +66,6 @@ class SharedSpace(Tk.Frame):
             self.padding.grid(row=0, column=3, sticky=Tk.NSEW)
             self.y_scroll.grid(row=0, column=4, sticky=Tk.NSEW)
 
-
-
             # Thread safe redraw queue
             self.queue = queue.Queue()
             self.poll_queue()

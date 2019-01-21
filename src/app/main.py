@@ -172,7 +172,7 @@ class BasicApp:
         return
 
     def clear_clock(self, *args):
-        """ Silently stops clock and prints message with user ID """
+        """ Stops the scheduling clock """
         self.evaluate("Clock.clear()")
         return
 
