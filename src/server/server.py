@@ -195,7 +195,7 @@ class Server(ThreadedServer):
         return
 
     def send_to_client(self, client_id, data):
-        for client in list(self.clients:)
+        for client in list(self.clients):
             if client.id == client_id:
                 client.send(data)
                 return
