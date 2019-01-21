@@ -334,7 +334,11 @@ class App(BasicApp):
 
             for player in players:
 
-                self.evaluate("{}.reset()".format(player))
+                code = "{}.reset()".format(player) # TODO // get code from Interpreter
+
+                self.send_monitored_code(code)
+
+                self.evaluate(code)
 
             # e.g. r1.reset() then eval the history of the codelet?
 
