@@ -63,7 +63,7 @@ class PeerBox(Tk.Frame):
 
         i = 0
 
-        for user_id, user in self.app.users.items():
+        for user_id, user in list(self.app.users.items()):
 
             y_pos = i * self.box_height
 

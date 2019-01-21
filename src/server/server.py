@@ -195,19 +195,19 @@ class Server(ThreadedServer):
         return
 
     def send_to_client(self, client_id, data):
-        for client in self.clients:
+        for client in list(self.clients:)
             if client.id == client_id:
                 client.send(data)
                 return
         return
 
     def send_to_all(self, data):
-        for client in self.clients:
+        for client in list(self.clients):
             client.send(data)
         return
 
     def connections(self):
-        for client in self.clients:
+        for client in list(self.clients):
             yield client.socket
 
     def authenticate(self, password):
@@ -329,7 +329,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def pull_all_code(self):
         """ Sends all current codelet data to the client """
         # Get all the connected users
-        for id_num, user in self.master.users.items():
+        for id_num, user in list(self.master.users.items()):
             if id_num != self.get_user_id():
                 self.send(MESSAGE_NAME(id_num, user.get_name()))
 

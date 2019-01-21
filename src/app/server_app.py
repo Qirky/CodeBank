@@ -201,7 +201,7 @@ class ServerApp(BasicApp):
     def handle_forward_monitored_eval(self, user_id, code):
         """ Forwards any local workspace evaluations to users that are monitoring them """
         data = MESSAGE_MONITOR_EVAL(user_id, code)
-        for dest_id, user in self.socket.users.items():
+        for dest_id, user in list(self.socket.users.items()):
             if user_id in user.get_monitored_users():
                 self.socket.send_to_client(dest_id, data)
         return 
