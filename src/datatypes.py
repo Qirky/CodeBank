@@ -99,6 +99,10 @@ class User:
         - name: str
         - codelet_id they are editing (None if not editing): int / None (maybe use -1 in place of None?)
         - is_typing, flag if user is adding a new codelet: bool
+        - colour: string of hex colour
+        - text_tag: string of tkinter tag
+        - is_monitored: bool for if user is monitoring private code pushes
+        - monitoring: list of user_id's this user is monitoring
     """
     def __init__(self, id_num, name):
         self.id = int(id_num)
@@ -107,6 +111,8 @@ class User:
         self.is_typing = False
         self.colour = GET_USER_COLOUR(self.id)
         self.text_tag = "text_tag_{}".format(self.id)
+        self.is_monitored = False
+        self.monitoring = []
 
     def __repr__(self):
         return self.name
@@ -123,8 +129,29 @@ class User:
     def get_is_typing(self):
         return self.is_typing
 
+    # Unnecessary?
     def get_codelet_id(self):
         return
+
+    def get_is_monitored(self):
+        return self.is_monitored
+
+    def get_monitored_users(self):
+        return self.monitoring
+
+    def add_monitoring(self, user_id):
+        if user_id not in self.monitoring:
+            self.monitoring.append(user_id)
+
+    def remove_monitoring(self, user_id):
+        if user_id in self.monitoring:
+            self.monitoring.remove(user_id)
+
+    def start_monitoring(self):
+        self.is_monitored = True
+
+    def stop_monitoring(self):
+        self.is_monitored = False
 
     def set_is_typing(self, flag):
         self.is_typing = bool(flag)

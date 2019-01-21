@@ -1,10 +1,12 @@
 from __future__ import absolute_import, print_function
 import queue, time, threading
 from .main import *
+from ..utils import APP_TYPES
 
 # Class for interface on the ServerSide (shown to audience)
 
 class ServerApp(BasicApp):
+    app_type = APP_TYPES.SERVER
     def __init__(self, *args, **kwargs):
         
         BasicApp.__init__(self, *args, **kwargs)
@@ -24,6 +26,9 @@ class ServerApp(BasicApp):
             HANDLE_REMOVE  : self.remove_user,
             HANDLE_CHAT    : self.receive_chat_message,
             HANDLE_CLEAR   : self.clear_clock,
+            HANDLE_MONITOR_START : self.handle_start_user_monitoring,
+            HANDLE_MONITOR_STOP  : self.handle_stop_user_monitoring,
+            HANDLE_MONITOR_EVAL  : self.handle_forward_monitored_eval,
         }
 
         # Poll the parent queue
@@ -182,6 +187,24 @@ class ServerApp(BasicApp):
         BasicApp.set_user_typing(self, user_id, flag)
         self.socket.send_to_all(MESSAGE_TYPING(user_id, flag))
         return
+
+    def handle_start_user_monitoring(self, user_id, req_id):
+        """ Flags that user[user_id] wants to monitor user[req_id] """
+        self.socket.users[user_id].add_monitoring(req_id)
+        return
+
+    def handle_stop_user_monitoring(self, user_id, req_id):
+        """ Flags that user[user_id] no longer wants to monitor user[req_id] """
+        self.socket.users[user_id].remove_monitoring(req_id)
+        return
+
+    def handle_forward_monitored_eval(self, user_id, code):
+        """ Forwards any local workspace evaluations to users that are monitoring them """
+        data = MESSAGE_MONITOR_EVAL(user_id, code)
+        for dest_id, user in self.socket.users.items():
+            if user_id in user.get_monitored_users():
+                self.socket.send_to_client(dest_id, data)
+        return 
 
     def receive_chat_message(self, user_id, message):
         """ Forward chat messages """

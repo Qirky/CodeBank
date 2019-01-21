@@ -7,13 +7,24 @@ class Console(Tk.Text):
     def __init__(self, *args, **kwargs):
         Tk.Text.__init__(self, *args, **kwargs)
         self.config(bg="black", height=10) # w = 50
-        self.tag_config("console", foreground="white")
+        self.text_colour = "console"
+        self.tag_config(self.text_colour, foreground="white")
         self.disable()
 
     def write(self, string):
         """ Print to console """
         self.enable()
-        self.insert(Tk.END, string, "console")
+        self.insert(Tk.END, string, self.text_colour)
+        self.see(Tk.END)
+        self.disable()
+        return
+
+    def insert_user_update(self, user, text):
+        self.enable()
+        self.tag_config(user.tag(), foreground=user.get_colour())
+        self.insert(Tk.END, "User '", self.text_colour)
+        self.insert(Tk.END, user.get_name(), user.tag())
+        self.insert(Tk.END, "' {}\n".format(text), self.text_colour)
         self.see(Tk.END)
         self.disable()
         return

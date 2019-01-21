@@ -3,11 +3,12 @@ from __future__ import absolute_import, print_function
 from .main import *
 from .connection_input import popup_window
 from .clock_nudge import ClockNudgePopup
-from ..utils import get_players, NULL, CONTROL_KEY
+from ..utils import get_players, NULL, CONTROL_KEY, APP_TYPES
 
 # Class for interface for client-side
 
 class App(BasicApp):
+    app_type = APP_TYPES.CLIENT
     def __init__(self, *args, **kwargs):
         
         BasicApp.__init__(self, *args, **kwargs)
@@ -59,6 +60,7 @@ class App(BasicApp):
             HANDLE_SEED     : self.update_random_seed,
             HANDLE_CHAT     : self.receive_chat_message,
             HANDLE_CLEAR    : self.clear_clock,
+            HANDLE_MONITOR_EVAL : self.evaluate_monitored_user,
         }
 
         # This stores the codelet being currently edited
@@ -193,6 +195,11 @@ class App(BasicApp):
 
         self.workspace.commands.default_all()
         
+        return
+
+    def send_monitored_code(self, string):
+        """ Sends code to server to be forwarded to users monitoring this local user """
+        self.socket.send(MESSAGE_MONITOR_EVAL(self.get_user_id(), string))
         return
 
     # Server communications
@@ -449,6 +456,8 @@ class App(BasicApp):
 
                 self.socket.send(data)
 
+        return
+
     #####
 
     def my_id(self, user_id):
@@ -548,23 +557,50 @@ class App(BasicApp):
 
             codelet.update(user_id, string, order_id)
 
+            update_text = "has updated a codelet."
+
         else:
 
             codelet = Codelet(code_id, user_id, string, order_id)
 
             self.sharedspace.add_codelet(codelet)
 
+            update_text = "has added a new codelet."
+
         # Evaluate the code
+
+        self.workspace.console.insert_user_update(self.socket.users[user_id], update_text)
 
         self.evaluate_codelet(codelet)
 
+        return
+
+    def start_monitoring_user(self, user):
+        """ Called from public list box widget - flags a user as being monitored """
+        self.workspace.console.insert_user_update(user, "is now being monitored")
+        user.start_monitoring()
+        self.socket.send(MESSAGE_MONITOR_START(self.get_user_id(), user.id))
+        return
+
+    def stop_monitoring_user(self, user):
+        """ Called from public list box widget - flags a user as not being monitored """
+        self.workspace.console.insert_user_update(user, "is no longer being monitored")
+        user.stop_monitoring()
+        self.socket.send(MESSAGE_MONITOR_STOP(self.get_user_id(), user.id))
+        return
+
+    def evaluate_monitored_user(self, user_id, string):
+        """ If a user is being monitored, then this method is called to evaluate their code """
+        self.workspace.console.insert_user_update(self.socket.users[user_id], "(monitored) has evaluated:")
+        self.evaluate(string)
         return
 
     def hide_codelet(self, user_id, codelet_id):
         """ Labels the codelet as hidden """
         self.get_codelet(codelet_id).hide()
         self.sharedspace.redraw()
-        print("User '{}' hiding codelet id. {}".format(self.get_user_name(user_id), codelet_id))
+        # print("User '{}' hiding codelet id. {}".format(self.get_user_name(user_id), codelet_id))
+        self.workspace.console.insert_user_update(self.socket.users[user_id], "is hiding codelet id. {}".format(codelet_id))
         return
 
     def rollback(self, user_id, codelet_id):
@@ -578,14 +614,21 @@ class App(BasicApp):
 
         return
 
+    def clear_clock(self, user_id):
+        """ Silently stops clock and prints message with user ID """
+        BasicApp.clear_clock(self)
+        # print("{} has cleared the clock.".format(self.get_user_name(user_id)))
+        self.workspace.console.insert_user_update(self.socket.users[user_id], "has cleard the clock")
+        return
 
-    def add_user(self, user_id, name):
+    def add_user(self, user_id, name): # what is the point
         """ Adds a user to the address book and updates the UI title if the local client """
         BasicApp.add_user(self, user_id, name)
         return
 
     def remove_user(self, user_id):
-        print("User  '{}' has disconnected.".format(self.get_user_name(user_id)))
+        # print("User  '{}' has disconnected.".format(self.get_user_name(user_id)))
+        self.workspace.console.insert_user_update(self.socket.users[user_id], "has disconnected")
         BasicApp.remove_user(self, user_id)
         return
 

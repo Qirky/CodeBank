@@ -140,6 +140,8 @@ class Workspace(Tk.Frame):
 
         if len(banned_code) == 0:
 
+            self.parent.send_monitored_code(code)
+
             self.parent.evaluate(code)
 
         else:

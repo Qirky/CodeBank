@@ -198,6 +198,7 @@ class Server(ThreadedServer):
         for client in self.clients:
             if client.id == client_id:
                 client.send(data)
+                return
         return
 
     def send_to_all(self, data):

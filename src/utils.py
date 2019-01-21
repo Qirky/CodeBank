@@ -22,6 +22,12 @@ elif sys.platform.startswith('linux'):
 
 CONTROL_KEY = "Command" if SYSTEM == MAC_OS else "Control"
 
+# App Types
+
+class APP_TYPES:
+    SERVER = 0
+    CLIENT = 1
+
 # Handler codes
 
 HANDLE_KILL     = 0
@@ -46,34 +52,50 @@ HANDLE_TYPING   = 18
 HANDLE_CHAT     = 19
 HANDLE_CLEAR    = 20
 
+HANDLE_MONITOR_START = 21
+HANDLE_MONITOR_STOP  = 22
+HANDLE_MONITOR_EVAL  = 23
+
+# user_id is always source
+
 def MESSAGE_KILL(user_id):
+    """ Correctly shut down application """
     return [HANDLE_KILL, user_id]
 
 def MESSAGE_PUSH(user_id, codelet_id, string):
+    """ Push new codelet to server """
     return [HANDLE_PUSH, user_id, codelet_id, string]
 
 def MESSAGE_UPDATE(user_id, codelet_id, string, order_id):
+    """ Update codelet with new data """
     return [HANDLE_UPDATE, user_id, codelet_id, string, order_id]
 
 def MESSAGE_LOAD(user_id, codelet_id):
+    """ Load / pull codelet to loca workspace """
     return [HANDLE_LOAD, user_id, codelet_id]
 
 def MESSAGE_RELEASE(user_id, codelet_id):
+    """ Push codelet with no change (does not update user_id) """
     return [HANDLE_RELEASE, user_id, codelet_id]
 
 def MESSAGE_NAME(user_id, name):
+    """ Adds a user to the directory """
     return [HANDLE_NAME, user_id, name]
 
 def MESSAGE_REQUEST(user_id, codelet_id):
+    """ Used to request access to send MESSAGE_LOAD """
     return [HANDLE_REQUEST, user_id, codelet_id]
 
 def MESSAGE_ERROR(user_id, err_msg):
+    """ Raises ConnectionError(err_msg) """
     return [HANDLE_ERROR, user_id, err_msg]
 
 def MESSAGE_INFO(user_id, string):
+    """ Prints information to console """
     return [HANDLE_INFO, user_id, string]
 
 def MESSAGE_REMOVE(user_id):
+    """  """
     return [HANDLE_REMOVE, user_id]
 
 def MESSAGE_HISTORY(user_id, codelet_id, data, order_id, hidden=0):
@@ -99,6 +121,15 @@ def MESSAGE_CHAT(user_id, message):
 
 def MESSAGE_CLEAR(user_id):
     return [HANDLE_CLEAR, user_id]
+
+def MESSAGE_MONITOR_START(user_id, req_id):
+    return [HANDLE_MONITOR_START, user_id, req_id]
+
+def MESSAGE_MONITOR_STOP(user_id, req_id):
+    return [HANDLE_MONITOR_STOP, user_id, req_id]
+
+def MESSAGE_MONITOR_EVAL(user_id, string):
+    return [HANDLE_MONITOR_EVAL, user_id, str(string)]
 
 # Special case codelet IDs
 
@@ -199,7 +230,7 @@ def GET_ERROR_COLOUR(i=None):
 def GET_ERROR_FONT_COLOUR(i=None):
     return "#e1325f"
 
-# Extracting informaton from code
+# Extracting informaton from code -- this will be moved to interpreter.py eventually
 
 import re
 def get_players(string):
