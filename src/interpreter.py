@@ -6,11 +6,15 @@ from subprocess import PIPE, STDOUT
 CREATE_NO_WINDOW = 0x08000000 if SYSTEM == WINDOWS else 0
 
 class Interpreter:
-    def __init__(self, path):
+    def __init__(self, path, verbose=True):
 
         self.path = shlex.split(path)
         self.stdout = tempfile.TemporaryFile("w+", 1) # buffering = 1
         self.is_alive = True
+        self.silent = not verbose
+
+        self._last_response = None
+        self._thread_lock = threading.Lock()
 
         try:
         
@@ -25,7 +29,7 @@ class Interpreter:
 
         except FileNotFoundError:
 
-            raise ExecutableNotFoundError(self.get_path_as_string())
+            raise ExecutableNotFoundError(self.path)
 
         self._banned_commands = []
         self._colour_map = {}
@@ -54,9 +58,20 @@ class Interpreter:
     def execute(self, code_string, verbose=True):
         """ Pipe string into interpreter """
         if code_string is not None:
-            self.print_out(code_string)
+            # Get thread control
+            self._thread_lock.acquire()
+            
+            if verbose and not self.silent:
+            
+                self.print_to_console(code_string)
+            
             self.pipe_to_process(code_string)
-        return
+            
+            output = self.wait_for_response()
+
+            self._thread_lock.release()
+        
+            return output
 
     def read_stdout(self, text=""):
         """ Continually reads the stdout from the self.process """
@@ -66,16 +81,39 @@ class Interpreter:
                 break
             try:
                 # Check contents of file
-                self.stdout.seek(0)
-                for stdout_line in iter(self.stdout.readline, ""):
-                    sys.stdout.write(stdout_line.rstrip())                
-                # clear tmpfile
-                self.stdout.truncate(0)
-                time.sleep(0.05)
+                self._thread_lock.acquire()
+                self.wait_for_response()
+                self._thread_lock.release()
             except ValueError as e:
                 print(e)
                 return
         return
+
+    def wait_for_response(self):
+        """ Waits a small amount of time to see if a process produces text output """
+
+        time.sleep(0.05)
+        
+        self.stdout.seek(0)
+
+        lines = []
+        
+        for stdout_line in iter(self.stdout.readline, ""):
+            
+            output = stdout_line.rstrip()
+
+            sys.stdout.write(output)
+            
+            lines.append(output)
+        
+        # clear tmpfile
+        self.stdout.truncate(0)
+        
+        return "\n".join(lines)
+
+    def get_last_response(self):
+        """ Returns the last output for the system """
+        return self._last_response
 
     def pipe_to_process(self, string):
         if self.is_alive:
@@ -83,11 +121,16 @@ class Interpreter:
             self.process.stdin.flush()
         return
 
-    def print_out(self, string):
+    def print_to_console(self, string):
         lines = [line.replace("\n", "") for line in string.split("\n") if len(line.strip()) > 0]
-        for line in lines:
-            sys.stdout.write(">>> {}".format(string))
+        for i, line in enumerate(lines):
+            if i == 0:
+                start = ">>>"
+            else:
+                start = "..."
+            sys.stdout.write("{} {}".format(start, string))
             sys.stdout.flush()
+        return
 
     def kill(self):
         """ Called to properly exit the subprocess"""
@@ -184,8 +227,9 @@ class Interpreter:
 
 class FoxDot(Interpreter):
     path = "python -u -m FoxDot --pipe"
-    def __init__(self):
-        Interpreter.__init__(self, FoxDot.path)
+    def __init__(self, *args, **kwargs):
+        Interpreter.__init__(self, FoxDot.path, *args, **kwargs)
+
         # Ban local changes to tempo / clock stopping
         self.add_banned_command(r".*(Clock\s*\.\s*bpm\s*[\+\-\*\/]*\s*=\s*.+)")
         self.add_banned_command(r".*(Clock\s*\.\s*clear\(\s*\))")
@@ -207,13 +251,13 @@ class FoxDot(Interpreter):
         return "{}\n\n".format(string)
 
     def start_server(self):
-        return self.execute("allow_connections()")
+        return self.execute("allow_connections()", verbose=False)
 
     def stop_server(self):
-        return self.execute("allow_connections(False)")
+        return self.execute("allow_connections(False)", verbose=False)
 
     def sync_to_server(self, ip_address):
-        return self.execute("Clock.connect('{}')".format(ip_address), verbose=True)
+        return self.execute("Clock.connect('{}')".format(ip_address), verbose=False)
 
     def contains_error(self, response):
         return response.startswith("Traceback") if type(response) == str else False

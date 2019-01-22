@@ -50,6 +50,8 @@ class ServerApp(BasicApp):
                 self.kill()
         return
 
+    def set_interpreter(self, *args, **kwargs):
+        return BasicApp.set_interpreter(self, *args, verbose=False, **kwargs)
 
     def poll_queue(self):
         """ Continually poll the server process queue then process each message one at a time

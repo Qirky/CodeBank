@@ -102,7 +102,7 @@ class BasicApp:
 
         else:
 
-            raise ConnectionError("No valid executable selected")
+            raise ConnectionError("Error starting interpreter")
 
         return
 
@@ -117,11 +117,17 @@ class BasicApp:
         """ Correctly shuts down the application """        
     
         self.socket.kill()
+        self.reset_stdout()
     
         if self.visible:
     
             self.root.destroy()
     
+        return
+
+    def reset_stdout(self):
+        """ Reset stdout for any error messages that are displayed when the window closes """
+        sys.stdout = sys.__stdout__
         return
 
     def handle_data(self, data):
@@ -151,9 +157,9 @@ class BasicApp:
         
         if self.lang is not None:
 
-            self.lang.execute(code, verbose=verbose)
+            return self.lang.execute(code, verbose=verbose)
 
-        return
+        return 
 
     def evaluate_codelet(self, codelet):
         """ Takes an instance of Codelet or CodeBox and evaluates the code. If there
@@ -161,7 +167,6 @@ class BasicApp:
 
         string = self.evaluate(codelet.get_text())
 
-        # if contains_error(string):
         if self.lang.contains_error(string):
 
             codelet.flag_error()
