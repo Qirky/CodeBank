@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function
 
 from ..utils import *
 from ..datatypes import *
+from ..interpreter import LANGUAGE_CLASS
 from .tkimport import Tk, tkFont
 from .menu import MenuBar
 from .public import SharedSpace
@@ -22,7 +23,7 @@ except:
 class BasicApp:
     text = None
     visible = True
-    def __init__(self, client, lang, *args, **kwargs):
+    def __init__(self, client, *args, **kwargs):
 
         self.visible = kwargs.get("visible", True)
 
@@ -87,10 +88,23 @@ class BasicApp:
 
             self._mouse_in_codebox_flag = False
 
-        # FoxDot interpreter
+        # Interpreter
 
-        self.lang = lang
+        self.lang = None
         self.seed = 0
+
+    def set_interpreter(self, lang_id, *args, **kwargs):
+        """ Starts up the interpreter """
+
+        if lang_id in LANGUAGE_CLASS:
+
+            self.lang = LANGUAGE_CLASS[lang_id](*args, **kwargs)
+
+        else:
+
+            raise ConnectionError("No valid executable selected")
+
+        return
 
     def run(self):
         """ Starts the TKinter mainloop """
@@ -137,7 +151,7 @@ class BasicApp:
         
         if self.lang is not None:
 
-            return self.lang.execute(code, verbose=verbose)
+            self.lang.execute(code, verbose=verbose)
 
         return
 
@@ -147,7 +161,8 @@ class BasicApp:
 
         string = self.evaluate(codelet.get_text())
 
-        if contains_error(string):
+        # if contains_error(string):
+        if self.lang.contains_error(string):
 
             codelet.flag_error()
 
@@ -163,7 +178,7 @@ class BasicApp:
 
     def update_random_seed(self, user_id=-1, seed=0):
         """ Sets the seed for random number generators"""
-        self.evaluate("RandomGenerator.set_override_seed({})".format(seed), verbose=False)
+        self.evaluate(self.lang.get_random_seed_setter(seed), verbose=False)
         return
 
     def receive_chat_message(self, user_id, message):
@@ -173,7 +188,7 @@ class BasicApp:
 
     def clear_clock(self, *args):
         """ Stops the scheduling clock """
-        self.evaluate("Clock.clear()")
+        self.evaluate(self.lang.get_stop_sound())
         return
 
     def get_codelets(self):

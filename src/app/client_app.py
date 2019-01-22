@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function
 from .main import *
 from .connection_input import popup_window
 from .clock_nudge import ClockNudgePopup
-from ..utils import get_players, NULL, CONTROL_KEY, APP_TYPES
+from ..utils import NULL, CONTROL_KEY, APP_TYPES
 
 # Class for interface for client-side
 
@@ -80,10 +80,6 @@ class App(BasicApp):
         self.solo_on = False
         self.selecting_codelet_to_hide = False
 
-        # Banned local commands
-
-        self.banned_commands = [re.compile(r".*(Clock\s*\.\s*bpm\s*[\+\-\*\/]*\s*=\s*.+)"), re.compile(r".*(Clock\s*\.\s*clear\(\s*\))")]
-
         # Don't allow users to use buttons / text box until connected
 
         self.disable()
@@ -149,7 +145,8 @@ class App(BasicApp):
 
                 self.nudge = nudge
 
-            self.evaluate("Clock.nudge = {}".format(self.nudge), verbose=False)
+            # self.evaluate("Clock.nudge = {}".format(self.nudge), verbose=False)
+            self.evaluate(self.lang.get_nudge_code(self.nudge), verbose=False)
 
             self.nudge_popup_open = False
 
@@ -169,7 +166,9 @@ class App(BasicApp):
         return
 
     def enable(self):
-        """ Allows textbox and buttons being used """ # 
+        """ Allows textbox and buttons being used """
+        self.workspace.text.update_colour_map()
+
         self._is_enabled = True
         self.root.title("CodeBank Client. Logged in as {}".format(self.get_client_name()))
 
@@ -299,21 +298,17 @@ class App(BasicApp):
         """ Will mute other players currently being run using FoxDot Player.solo method.
             Triggered by the SOLO button. """
         if self._is_enabled:
-            players = get_players(self.workspace.text.get_text())
-            if len(players):
+            code = self.lang.get_solo_code(self.workspace.text.get_text(), self.solo_on)
+            if code is not None:
                 self.solo_on = not self.solo_on
-                if len(players) > 1:
-                    cmd = "Group({}).solo({})".format(", ".join(players), int(self.solo_on))
-                elif len(players) == 1:
-                    cmd = "{}.solo({})".format(players[0], int(self.solo_on))
-                self.evaluate(cmd)
+                self.evaluate(code)
         return
 
     def check_valid_command(self, string):
         """ Returns a list of code chunks that are not allowed to be run on a local version """
         banned = []
         for line in string.split("\n"):
-            for phrase in self.banned_commands:
+            for phrase in self.lang.get_banned_commands():
                 match = phrase.match(line)
                 if match is not None:
                     banned.append(match.group(1))
@@ -575,32 +570,11 @@ class App(BasicApp):
         return
 
     def get_reset_code(self, working_code, codelet_id):
-        
-        reset_code = []
-
         if codelet_id == NULL:
-
-            codelet = None
-            func = "stop"
-
+            codelet_code = ""
         else:
-
-            codelet = self.sharedspace.codelets[codelet_id].get_codelet()
-            func    = "reset"
-
-        # TODO // get code from Interpreter
-
-        players = get_players(working_code)
-
-        for player in players:
-            
-            reset_code.append("{}.{}()".format(player, func))
-
-        if codelet is not None:
-
-            reset_code.append(codelet.get_text())
-
-        return "\n".join(reset_code)
+            codelet_code = self.sharedspace.codelets[codelet_id].get_codelet().get_text()
+        return self.lang.get_reset_code(working_code, codelet_code)
 
     def reset_program_state(self, event=None):
         """ Resets the program state to before the last push, triggered by the RESET button """

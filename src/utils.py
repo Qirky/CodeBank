@@ -229,14 +229,3 @@ def GET_ERROR_COLOUR(i=None):
 
 def GET_ERROR_FONT_COLOUR(i=None):
     return "#e1325f"
-
-# Extracting informaton from code -- this will be moved to interpreter.py eventually
-
-import re
-def get_players(string):
-    """ Uses RegEx to return the FoxDot players in a block of text """
-    return re.findall(r"(\w+)\s*>>", string)
-
-def contains_error(response):
-    """ Returns True if the response from evaluating code begins with Traceback """
-    return response.startswith("Traceback") if type(response) == str else False

@@ -9,23 +9,10 @@ class TextInput(Tk.Text):
         Tk.Text.__init__(self, parent, *args, **kwargs)
         self.parent = main # pvt_main
         self.root   = self.parent.parent # client_app
+        
+        self.lang   = None
 
-        self.lang   = self.root.lang
-        self.lang_format = self.lang.Workspace.Format
         self.config(height=10, width=100)
-
-        # Set some custom colours
-
-        self.lang_format.colour_map["strings"] = "Green"
-        self.lang_format.colour_map["arrow"]   = "#e89c18"
-
-        for tier in self.lang_format.tag_weights:
-
-            for tag_name in tier:
-
-                self.tag_config(tag_name, foreground=self.lang_format.colour_map[tag_name])
-
-        self.tag_config("highlight", background="red", foreground="white")
 
         # Disable certain actions
 
@@ -59,6 +46,15 @@ class TextInput(Tk.Text):
         if type(index1) == str and index2 == None:
             return tuple(int(n) for n in index1.split('.'))
         return str(index1) + '.' + str(index2)
+
+    def update_colour_map(self):
+        """ Called when a language is chosen to apply syntax highlighting """
+        self.lang = self.root.lang
+        self.colour_map = self.lang.get_formatting()
+        for tag_name in self.colour_map:
+            self.tag_config(tag_name, foreground=self.colour_map[tag_name][1])
+        self.tag_config("highlight", background="red", foreground="white")
+        return
         
     def get_text(self):
         """ Returns the contents of the text box """
@@ -221,7 +217,7 @@ class TextInput(Tk.Text):
 
             # Re-apply tags
 
-            for tag_name, start, end in self.lang_format.findstyles(thisline):
+            for tag_name, start, end in self.lang.findstyles(thisline):
                 
                 self.tag_add(tag_name, self.convert_index(line, start), self.convert_index(line, end))
 

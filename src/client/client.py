@@ -5,10 +5,7 @@ from threading import Thread
 from hashlib import md5
 from ..utils import *
 from ..app import *
-
-import FoxDot # should pipe to FoxDot
-
-# FoxDot = None
+from ..interpreter import *
 
 class Client:
     """ Represents the local client and talks to the server """
@@ -24,14 +21,14 @@ class Client:
         self.users     = {}
         self.user_id   = None
         self.user_name = None
-        # UI
-        self.app       = App(self, FoxDot)
+        # UI and interpreter
+        self.app       = App(self)
 
     def run(self):
         """ Calls the mainloop method on the application """
         self.app.run()
 
-    def connect(self, hostname, port, username, password):
+    def connect(self, hostname, port, username, password, lang_id=0):
         """ Connects to the server instance """
 
         # Get details of remote
@@ -50,7 +47,7 @@ class Client:
 
         except Exception as e:
 
-            raise(e)
+            raise(e) # which one to use?
 
             raise(ConnectionError("Could not connect to host '{}'".format( self.hostname ) ) )
 
@@ -58,15 +55,16 @@ class Client:
 
         self.authenticate_with_server(username, password)
 
+        # Setup lang
+
+        self.app.set_interpreter(lang_id)
+        self.app.lang.sync_to_server(self.hostname)
+
         # Start listening
 
         self.listening = True
         self.daemon = Thread(target=self.listen)
         self.daemon.start()
-
-        # Connect FoxDot isntances
-
-        self.app.lang.Clock.connect(self.hostname)
 
         # Enable app
 
@@ -115,5 +113,6 @@ class Client:
             self.socket.close()
         if self.daemon is not None:
             self.daemon.join(1)
-        self.app.lang.Clock.stop()
+        if self.app.lang is not None:
+            self.app.lang.kill()
         return

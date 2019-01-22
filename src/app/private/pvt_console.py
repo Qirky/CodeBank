@@ -14,7 +14,7 @@ class Console(Tk.Text):
     def write(self, string):
         """ Print to console """
         self.enable()
-        self.insert(Tk.END, string, self.text_colour)
+        self.insert(Tk.END, string + "\n", self.text_colour)
         self.see(Tk.END)
         self.disable()
         return

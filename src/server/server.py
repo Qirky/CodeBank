@@ -25,7 +25,7 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
 class Server(ThreadedServer):
     """ Wrapper to the threaded server instance """
-    def __init__(self, port=57890, **kwargs):
+    def __init__(self, port=57890, lang_id=0, **kwargs):
 
         # Get password
         try:
@@ -74,9 +74,8 @@ class Server(ThreadedServer):
 
         # Create interface
 
-        import FoxDot
-
-        self.app = ServerApp(self, FoxDot, **kwargs)
+        self.app = ServerApp(self, **kwargs)
+        self.app.set_interpreter(lang_id)
         self.app.update_random_seed(seed=self.get_seed())
 
     def __str__(self):
@@ -87,7 +86,7 @@ class Server(ThreadedServer):
 
         print("Server running @ {}".format(str(self)))
 
-        self.app.lang.allow_connections()        
+        self.app.lang.start_server()        
         self.running = True
         self.server_thread.start()
         self.app.run()
@@ -104,7 +103,8 @@ class Server(ThreadedServer):
         # Stop running loop
 
         self.running = False
-        self.app.lang.allow_connections(False)
+        self.app.lang.stop_server()
+        self.app.lang.kill()
 
         self.send_to_all(MESSAGE_SHUTDOWN())
 

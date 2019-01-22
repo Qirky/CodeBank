@@ -88,6 +88,10 @@ class ServerApp(BasicApp):
 
     # Handler methods
 
+    def evaluate(self, *args, **kwargs):
+        BasicApp.evaluate(self, *args, **kwargs)
+        return print() # force newline
+
     def handle_kill(self, user_id):
         return
 
