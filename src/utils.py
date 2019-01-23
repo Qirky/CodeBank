@@ -1,4 +1,5 @@
 import sys, json
+import os.path
 from socket import error as socket_error
 
 # System info
@@ -22,6 +23,10 @@ elif sys.platform.startswith('linux'):
 
 CONTROL_KEY = "Command" if SYSTEM == MAC_OS else "Control"
 
+# boot file directories
+
+BOOT_DIR = os.path.join(os.path.dirname(__file__), "boot")
+TIDAL_BOOT_FILE = os.path.join(BOOT_DIR, "tidal.boot") 
 # App Types
 
 class APP_TYPES:

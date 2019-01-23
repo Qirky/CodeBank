@@ -1,4 +1,4 @@
-from .utils import SYSTEM, WINDOWS
+from .utils import SYSTEM, WINDOWS, TIDAL_BOOT_FILE
 import re, shlex, threading, tempfile, time, sys
 from subprocess import Popen
 from subprocess import PIPE, STDOUT
@@ -6,12 +6,15 @@ from subprocess import PIPE, STDOUT
 CREATE_NO_WINDOW = 0x08000000 if SYSTEM == WINDOWS else 0
 
 class Interpreter:
+    prompt = ">>>"
     def __init__(self, path, verbose=True):
 
         self.path = shlex.split(path)
         self.stdout = tempfile.TemporaryFile("w+", 1) # buffering = 1
         self.is_alive = True
         self.silent = not verbose
+
+        self.streams = re.compile(self.__class__.re_streams)
 
         self._last_response = None
         self._thread_lock = threading.Lock()
@@ -33,9 +36,9 @@ class Interpreter:
 
         self._banned_commands = []
         self._colour_map = {}
-        self.execute(self.setup_code(), verbose=False)
+        self.execute_setup_code()
 
-    def setup_code(self):
+    def execute_setup_code(self):
         """ Called from __init__ - code required at startup e.g. imports """
         return
 
@@ -55,6 +58,10 @@ class Interpreter:
         """ Formats code specifically to an interpreter if necessary """
         return string
 
+    def get_streams(self, string):
+        """ Uses a RegEx to return the streams of audio present in a string of code """
+        return self.streams.findall(string)
+
     def execute(self, code_string, verbose=True):
         """ Pipe string into interpreter """
         if code_string is not None:
@@ -73,6 +80,12 @@ class Interpreter:
         
             return output
 
+    def pipe_to_process(self, string):
+        if self.is_alive:
+            self.process.stdin.write(self.format_code(string))
+            self.process.stdin.flush()
+        return
+
     def read_stdout(self, text=""):
         """ Continually reads the stdout from the self.process """
         while self.is_alive:
@@ -82,18 +95,31 @@ class Interpreter:
             try:
                 # Check contents of file
                 self._thread_lock.acquire()
-                self.wait_for_response()
+                self.get_response()
                 self._thread_lock.release()
+                time.sleep(0.05)
             except ValueError as e:
                 print(e)
                 return
         return
 
-    def wait_for_response(self):
-        """ Waits a small amount of time to see if a process produces text output """
+    def print_to_console(self, string):
+        lines = [line.replace("\n", "") for line in string.split("\n") if len(line.strip()) > 0]
+        for i, line in enumerate(lines):
+            if i == 0:
+                start = self.prompt
+            else:
+                start = "." * len(self.prompt)
+            sys.stdout.write("{} {}".format(start, line))
+            sys.stdout.flush()
+        return
 
+    def wait_for_response(self):
         time.sleep(0.05)
-        
+        return self.get_response()
+
+    def get_response(self):
+        """ Waits a small amount of time to see if a process produces text output """        
         self.stdout.seek(0)
 
         lines = []
@@ -119,32 +145,13 @@ class Interpreter:
         
         return "\n".join(lines)
 
-    def get_last_response(self):
-        """ Returns the last output for the system """
-        return self._last_response
-
-    def pipe_to_process(self, string):
-        if self.is_alive:
-            self.process.stdin.write(self.format_code(string))
-            self.process.stdin.flush()
-        return
-
-    def print_to_console(self, string):
-        lines = [line.replace("\n", "") for line in string.split("\n") if len(line.strip()) > 0]
-        for i, line in enumerate(lines):
-            if i == 0:
-                start = ">>>"
-            else:
-                start = "..."
-            sys.stdout.write("{} {}".format(start, string))
-            sys.stdout.flush()
-        return
-
     def kill(self):
-        """ Called to properly exit the subprocess"""
+        """ Called to properly exit the subprocess and threads """
         self.is_alive = False
         if self.process.poll() is None:
             self.process.communicate()
+        if self.stdout_thread is not None:
+            self.stdout_thread.join(1)
         return
 
     def contains_error(self, response):
@@ -158,10 +165,6 @@ class Interpreter:
         """ Returns code for setting the same random seed value """
         return
 
-    def get_streams(self, string):
-        """ Returns a list of objects that correspond to each different audio stream in a codelet """
-        return
-
     def get_stop_sound(self):
         """ Returns the code for stopping all sound / clearing a scheduling clock """
         return
@@ -170,6 +173,7 @@ class Interpreter:
         """ Returns code for solo-ing a single codelet / workspace text. Should 
             return None if no streams exist. `on` is a bool for solo-ing or desolo-ing"""
         return None
+
     def get_reset_code(self, local_code, codelet_code):
         """ Returns code necessary to reset program state. If codelet_code is empty,
             stop any streams. If it exists, reset streams and apply codelet_code """
@@ -235,8 +239,9 @@ class Interpreter:
 
 class FoxDot(Interpreter):
     path = "python -u -m FoxDot --pipe"
+    re_streams = r"(\w+)\s*>>"
     def __init__(self, *args, **kwargs):
-        Interpreter.__init__(self, FoxDot.path, *args, **kwargs)
+        Interpreter.__init__(self, self.__class__.path, *args, **kwargs)
 
         # Ban local changes to tempo / clock stopping
         self.add_banned_command(r".*(Clock\s*\.\s*bpm\s*[\+\-\*\/]*\s*=\s*.+)")
@@ -316,12 +321,85 @@ class FoxDot(Interpreter):
         return "\n".join(reset_code)
 
 class TidalCycles(Interpreter):
-    pass
-    # def get_stop_sound(self):
-    #     """ Returns the code for stopping all sound / clearing a scheduling clock """
-    #     return "hush"
+    path = 'ghci'
+    prompt = "tidal>"
+    re_streams = r"(d\d)\s*"
+    def __init__(self, *args, **kwargs):
+        Interpreter.__init__(self, self.__class__.path, *args, **kwargs)
 
-LANGUAGE_NAMES = { "FoxDot": 0, "TidalCycles": 1 }
+        # Ban local changes to tempo / clock stopping
+        self.add_banned_command(r".*cps.*")
+        self.add_banned_command(r".*hush.*")
+
+        # Set up syntax colouring
+        self.add_to_colour_map(r"(?<=>>)(\s*\w+)", '#ec4e20', name="players")
+        self.add_to_colour_map(r"^\s*--.*|[^\"']*(--[^\"']*$)", '#666666', name="comments")
+        self.add_to_colour_map(r"\W+(\d+)", '#e89c18', name="numbers")
+        self.add_to_colour_map(r"\$|#", "Dark Green", name="syntax", )
+        self.add_to_colour_map(r"\".*?\"|\".*" + "|\'.*?\'|\'.*", "Green", name="strings")
+
+    def execute_setup_code(self):
+        # Import and setup tidal
+        with open(TIDAL_BOOT_FILE) as f:
+
+            for line in f.readlines():
+
+                self.process.stdin.write(line.rstrip() + "\n")
+                self.process.stdin.flush()
+
+        return
+
+    def get_stop_sound(self):
+        """ Returns the code for stopping all sound / clearing a scheduling clock """
+        return "hush"
+
+    def get_nudge_code(self, value):
+        return "nudge {}".format(value)
+
+    def get_solo_code(self, string, on):
+        return None
+
+    def get_reset_code(self, local_code, codelet_code):
+        reset_code = []
+        
+        # Add reset/stop code
+        streams = self.get_streams(local_code)
+
+        for stream in streams:
+           
+            reset_code.append("{} $ silence".format(stream))
+
+        # Re-apply codelet text if it exists
+
+        if codelet_code != "":
+        
+            reset_code.append(codelet_code)
+
+        return "do {\n" + ";\n".join(reset_code) + "}\n"
+
+    def format_code(self, string):
+        """ Used to formant multiple lines in haskell """
+        return ":{\n" + string + "\n:}\n"
+
+    def contains_error(self, response):
+        return response.lstrip().startswith("<interactive>") if type(response) == str else False
+
+class TidalCyclesStack(TidalCycles):
+    path = "stack ghci"
+
+
+LANGUAGE_IDENT = { "foxdot" : "FoxDot",
+                   "tidalcycles" : "TidalCycles",
+                   "tidalcyclesstack" : "TidalCycles (Stack)" }
+
+LANGUAGE_NAMES = { "FoxDot": 0, "TidalCycles": 1, "TidalCycles (Stack)": 2 }
 
 LANGUAGE_CLASS = { LANGUAGE_NAMES["FoxDot"] : FoxDot,
-                   LANGUAGE_NAMES["TidalCycles"] : TidalCycles }
+                   LANGUAGE_NAMES["TidalCycles"] : TidalCycles,
+                   LANGUAGE_NAMES["TidalCycles (Stack)"] :TidalCyclesStack }
+
+def get_interpreter_id(name):
+    try:
+        return LANGUAGE_NAMES[LANGUAGE_IDENT[name.lower()]]
+    except KeyError:
+        return None

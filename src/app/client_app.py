@@ -570,6 +570,7 @@ class App(BasicApp):
         return
 
     def get_reset_code(self, working_code, codelet_id):
+        """ Get code for resetting the current local code. """
         if codelet_id == NULL:
             codelet_code = ""
         else:
