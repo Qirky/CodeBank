@@ -99,10 +99,18 @@ class Interpreter:
         lines = []
         
         for stdout_line in iter(self.stdout.readline, ""):
-            
+
             output = stdout_line.rstrip()
 
-            sys.stdout.write(output)
+            # If printing to console, write the original line
+
+            if self.silent:
+
+                sys.stdout.write(stdout_line)
+
+            else:
+
+                sys.stdout.write(output)
             
             lines.append(output)
         
@@ -307,5 +315,13 @@ class FoxDot(Interpreter):
 
         return "\n".join(reset_code)
 
+class TidalCycles(Interpreter):
+    pass
+    # def get_stop_sound(self):
+    #     """ Returns the code for stopping all sound / clearing a scheduling clock """
+    #     return "hush"
+
 LANGUAGE_NAMES = { "FoxDot": 0, "TidalCycles": 1 }
-LANGUAGE_CLASS = { 0 : FoxDot}
+
+LANGUAGE_CLASS = { LANGUAGE_NAMES["FoxDot"] : FoxDot,
+                   LANGUAGE_NAMES["TidalCycles"] : TidalCycles }
