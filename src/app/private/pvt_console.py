@@ -1,6 +1,7 @@
 from __future__ import absolute_import, print_function
 
 from ..tkimport import Tk
+from ...utils import CONTROL_KEY
 
 class Console(Tk.Text):
     """docstring for TextInput"""
@@ -9,6 +10,7 @@ class Console(Tk.Text):
         self.config(bg="black", height=10) # w = 50
         self.text_colour = "console"
         self.tag_config(self.text_colour, foreground="white")
+        self.bind("<{}-c>".format(CONTROL_KEY), self.copy)
         self.disable()
 
     def write(self, string):
@@ -26,6 +28,12 @@ class Console(Tk.Text):
         self.insert(Tk.END, user.get_name(), user.tag())
         self.insert(Tk.END, "' {}\n".format(text), self.text_colour)
         self.see(Tk.END)
+        self.disable()
+        return
+
+    def copy(self, *args):
+        self.enable()
+        self.event_generate("<<Copy>>")
         self.disable()
         return
 
