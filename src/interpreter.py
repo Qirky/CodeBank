@@ -1,4 +1,4 @@
-from .utils import SYSTEM, WINDOWS, TIDAL_BOOT_FILE
+from .utils import SYSTEM, WINDOWS, TIDAL_BOOT_FILE, PYTHON_EXECUTABLE
 import re, shlex, threading, tempfile, time, sys
 from subprocess import Popen
 from subprocess import PIPE, STDOUT
@@ -238,7 +238,7 @@ class Interpreter:
         return self._banned_commands
 
 class FoxDot(Interpreter):
-    path = "python -u -m FoxDot --pipe"
+    path = "{} -u -m FoxDot --pipe".format(PYTHON_EXECUTABLE)
     re_streams = r"(\w+)\s*>>"
     def __init__(self, *args, **kwargs):
         Interpreter.__init__(self, self.__class__.path, *args, **kwargs)

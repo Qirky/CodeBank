@@ -2,6 +2,16 @@ import sys, json
 import os.path
 from socket import error as socket_error
 
+# If this is compiled file, just use python for speaking to FoxDot
+
+if sys.argv[0] == sys.executable: 
+
+    PYTHON_EXECUTABLE = "python"
+
+else:
+
+    PYTHON_EXECUTABLE = os.path.basename(sys.executable)
+
 # System info
 
 SYSTEM  = 0
