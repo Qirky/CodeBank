@@ -16,20 +16,22 @@ class popup_window:
         lbl = Tk.Label(top, text="Name:")
         lbl.grid(row=1, column=0, sticky=Tk.W)
         self.name=Tk.Entry(top)
-        self.name.grid(row=1, column=1)
+        self.name.grid(row=1, column=1, sticky=Tk.NSEW)
         
         # Password
         lbl = Tk.Label(top, text="Password: ")
         lbl.grid(row=2, column=0, sticky=Tk.W)
         self.password=Tk.Entry(top, show="*")
-        self.password.grid(row=2, column=1)
+        self.password.grid(row=2, column=1, sticky=Tk.NSEW)
         
         # Interpreter
+        options = list(LANGUAGE_NAMES.keys())
+
         lbl = Tk.Label(top, text="Language: ")
         lbl.grid(row=3, column=0, sticky=Tk.W)
         self.lang = Tk.StringVar(top)
-        self.lang.set("FoxDot")
-        self.drop = Tk.OptionMenu(top, self.lang, *list(LANGUAGE_NAMES.keys()))
+        self.lang.set(options[0])
+        self.drop = Tk.OptionMenu(top, self.lang, *options)
         self.drop.grid(row=3, column=1, sticky=Tk.NSEW)
         
         # Ok button

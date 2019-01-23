@@ -357,6 +357,7 @@ class TidalCycles(Interpreter):
         return "nudge {}".format(value)
 
     def get_solo_code(self, string, on):
+        # need to add
         return None
 
     def get_reset_code(self, local_code, codelet_code):
