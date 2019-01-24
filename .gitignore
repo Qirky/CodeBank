@@ -16,6 +16,9 @@ $RECYCLE.BIN/
 
 # Compiled python files
 *.pyc
+build/*
+dist/*
+*.spec
 
 # Windows shortcuts
 *.lnk
