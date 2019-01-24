@@ -1,4 +1,4 @@
-:set -XOverloadedStrings
+bootstrap = """:set -XOverloadedStrings
 :set prompt ""
 :set prompt-cont ""
 
@@ -54,3 +54,4 @@ let d15 = p 15
 let d16 = p 16
 
 :set prompt "tidal> "
+"""

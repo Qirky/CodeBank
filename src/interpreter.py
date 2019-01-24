@@ -340,12 +340,13 @@ class TidalCycles(Interpreter):
 
     def execute_setup_code(self):
         # Import and setup tidal
-        with open(TIDAL_BOOT_FILE) as f:
 
-            for line in f.readlines():
+        from .boot.tidal import bootstrap
 
-                self.process.stdin.write(line.rstrip() + "\n")
-                self.process.stdin.flush()
+        for line in bootstrap.split("\n"):
+
+            self.process.stdin.write(line.rstrip() + "\n")
+            self.process.stdin.flush()
 
         return
 
@@ -376,7 +377,7 @@ class TidalCycles(Interpreter):
         
             reset_code.append(codelet_code)
 
-        return "do {\n" + ";\n".join(reset_code) + "}\n"
+        return "do {\n" + ";\n".join(reset_code) + "\n}\n"
 
     def format_code(self, string):
         """ Used to formant multiple lines in haskell """
