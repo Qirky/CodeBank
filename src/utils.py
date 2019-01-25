@@ -33,6 +33,10 @@ elif sys.platform.startswith('linux'):
 
 CONTROL_KEY = "Command" if SYSTEM == MAC_OS else "Control"
 
+# Port number to connect to
+
+SERVER_PORT_NUMER = 57890
+
 # boot file directories
 
 BOOT_DIR = os.path.join(os.path.dirname(__file__), "boot")

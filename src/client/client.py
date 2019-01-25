@@ -28,7 +28,7 @@ class Client:
         """ Calls the mainloop method on the application """
         self.app.run()
 
-    def connect(self, hostname, port, username, password, lang_id=0):
+    def connect(self, hostname, port, username, password, interpreter):
         """ Connects to the server instance """
 
         # Get details of remote
@@ -53,11 +53,11 @@ class Client:
 
         # Password test
 
-        self.authenticate_with_server(username, password)
+        self.authenticate_with_server(username, password, interpreter.get_id())
 
         # Setup lang
 
-        self.app.set_interpreter(lang_id)
+        self.app.set_interpreter(interpreter)
         self.app.lang.sync_to_server(self.hostname)
 
         # Start listening
@@ -72,9 +72,10 @@ class Client:
         
         return self
 
-    def authenticate_with_server(self, username, password):
-        """ Encrypts password and send a basic message to the server with username and password."""
-        self.send( [username, md5(password.encode("utf-8")).hexdigest()] )
+    def authenticate_with_server(self, username, password, lang_id):
+        """ Encrypts password and send a basic message to the server with username, password,
+            and the ID of the interpreter used """
+        self.send( [username, md5(password.encode("utf-8")).hexdigest(), lang_id] )
         self.recv()
         return
 

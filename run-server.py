@@ -15,17 +15,17 @@ parser.add_argument('-m', '--mode', action='store', default="foxdot", help="Name
 
 args = parser.parse_args()
 
-from src.interpreter import get_interpreter_id
+from src.interpreter import get_interpreter
 
-lang_id = get_interpreter_id(args.mode)
+lang = get_interpreter(args.mode)
 
-if lang_id is None:
+if lang is None:
 
     sys.exit("FatalError: '{}' is not a valid interpreter.".format(args.mode))
 
 from src.server import Server
 
-myServer = Server(lang_id=lang_id, visible=args.no_gui)
+myServer = Server(interpreter=lang, visible=args.no_gui)
 myServer.start()
 
     

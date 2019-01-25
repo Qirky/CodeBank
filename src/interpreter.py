@@ -7,6 +7,10 @@ CREATE_NO_WINDOW = 0x08000000 if SYSTEM == WINDOWS else 0
 
 class Interpreter:
     prompt = ">>>"
+    name = "Interpreter"
+    name_short = None
+    name_long = None
+    ident = None
     def __init__(self, path, verbose=True):
 
         self.path = shlex.split(path)
@@ -32,11 +36,23 @@ class Interpreter:
 
         except FileNotFoundError:
 
-            raise ExecutableNotFoundError(self.path)
+            raise FileNotFoundError(self.path)
 
         self._banned_commands = []
         self._colour_map = {}
         self.execute_setup_code()
+
+    @classmethod
+    def get_short_name(cls):
+        return cls.name_short
+
+    @classmethod
+    def get_name(cls):
+        return cls.name_long
+
+    @classmethod
+    def get_id(cls):
+        return cls.ident
 
     def execute_setup_code(self):
         """ Called from __init__ - code required at startup e.g. imports """
@@ -240,6 +256,9 @@ class Interpreter:
 class FoxDot(Interpreter):
     path = "{} -u -m FoxDot --pipe".format(PYTHON_EXECUTABLE)
     re_streams = r"(\w+)\s*>>"
+    name_short = "foxdot"
+    name_long  = "FoxDot"
+    ident = 0
     def __init__(self, *args, **kwargs):
         Interpreter.__init__(self, self.__class__.path, *args, **kwargs)
 
@@ -324,6 +343,9 @@ class TidalCycles(Interpreter):
     path = 'ghci'
     prompt = "tidal>"
     re_streams = r"(d\d)\s*"
+    name_short = "tidalcycles"
+    name_long  = "TidalCycles"
+    ident = 1
     def __init__(self, *args, **kwargs):
         Interpreter.__init__(self, self.__class__.path, *args, **kwargs)
 
@@ -388,20 +410,33 @@ class TidalCycles(Interpreter):
 
 class TidalCyclesStack(TidalCycles):
     path = "stack ghci"
+    name_short = "tidalcyclesstack"
+    name_long  = "TidalCycles (Stack)"
 
 
-LANGUAGE_IDENT = { "foxdot" : "FoxDot",
-                   "tidalcycles" : "TidalCycles",
-                   "tidalcyclesstack" : "TidalCycles (Stack)" }
 
-LANGUAGE_NAMES = { "FoxDot": 0, "TidalCycles": 1, "TidalCycles (Stack)": 2 }
+LANGUAGE_IDENT = {  FoxDot.get_short_name() : FoxDot,
+                    TidalCycles.get_short_name() : TidalCycles,
+                    TidalCyclesStack.get_short_name() : TidalCyclesStack }
 
-LANGUAGE_CLASS = { LANGUAGE_NAMES["FoxDot"] : FoxDot,
-                   LANGUAGE_NAMES["TidalCycles"] : TidalCycles,
-                   LANGUAGE_NAMES["TidalCycles (Stack)"] :TidalCyclesStack }
+LANGUAGE_NAMES = { FoxDot.get_name() : FoxDot.get_short_name(),
+                   TidalCycles.get_name() : TidalCycles.get_short_name(),
+                   TidalCyclesStack.get_name() : TidalCyclesStack.get_short_name() }
 
-def get_interpreter_id(name):
-    try:
-        return LANGUAGE_NAMES[LANGUAGE_IDENT[name.lower()]]
-    except KeyError:
-        return None
+# LANGUAGE_IDENT = { "foxdot" : "FoxDot",
+#                    "tidalcycles" : "TidalCycles",
+#                    "tidalcyclesstack" : "TidalCycles (Stack)" }
+
+# LANGUAGE_NAMES = { "FoxDot": 0, "TidalCycles": 1, "TidalCycles (Stack)": 2 }
+
+# LANGUAGE_ID_NUM = {  }
+
+# LANGUAGE_CLASS = { LANGUAGE_NAMES["FoxDot"] : FoxDot,
+#                    LANGUAGE_NAMES["TidalCycles"] : TidalCycles,
+#                    LANGUAGE_NAMES["TidalCycles (Stack)"] :TidalCyclesStack }
+
+def get_interpreter(name):
+    return LANGUAGE_IDENT.get(name.lower(), None)
+
+def get_short_name(long_name):
+    return LANGUAGE_NAMES[long_name]

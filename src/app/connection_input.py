@@ -1,6 +1,8 @@
 from __future__ import absolute_import, print_function
+from .. import interpreter
+
 from .main import *
-from ..interpreter import LANGUAGE_NAMES
+from ..utils import SERVER_PORT_NUMER
 
 class popup_window:
     def __init__(self, master, title=""):
@@ -25,7 +27,7 @@ class popup_window:
         self.password.grid(row=2, column=1, sticky=Tk.NSEW)
         
         # Interpreter
-        options = list(LANGUAGE_NAMES.keys())
+        options = list(interpreter.LANGUAGE_NAMES)
 
         lbl = Tk.Label(top, text="Language: ")
         lbl.grid(row=3, column=0, sticky=Tk.W)
@@ -49,14 +51,19 @@ class popup_window:
 
     def cleanup(self, event=None):
         """ Stores the data in the entry fields then closes the window """
+        
         host = self.host.get()
-        port = 57890 ## TODO - get this from somewhere else
+        port = SERVER_PORT_NUMER
         name = self.name.get()
         password = self.password.get()
-        lang = LANGUAGE_NAMES[self.lang.get()]
+
+        ident = interpreter.get_short_name(self.lang.get())
+        lang = interpreter.get_interpreter(ident) # Returns the interpreter class
+
         if name.strip() != "" and host.strip() != "":
             self.value = (host, port, name, password, lang)
             self.top.destroy()
+       
         return
 
     def center(self):

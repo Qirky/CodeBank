@@ -2,7 +2,6 @@ from __future__ import absolute_import, print_function
 
 from ..utils import *
 from ..datatypes import *
-from ..interpreter import LANGUAGE_CLASS
 from .tkimport import Tk, tkFont
 from .menu import MenuBar
 from .public import SharedSpace
@@ -93,16 +92,10 @@ class BasicApp:
         self.lang = None
         self.seed = 0
 
-    def set_interpreter(self, lang_id, *args, **kwargs):
+    def set_interpreter(self, interpreter, *args, **kwargs):
         """ Starts up the interpreter """
 
-        if lang_id in LANGUAGE_CLASS:
-
-            self.lang = LANGUAGE_CLASS[lang_id](*args, **kwargs)
-
-        else:
-
-            raise ConnectionError("Error starting interpreter")
+        self.lang = interpreter(*args, **kwargs) # raises an error if file not found
 
         return
 

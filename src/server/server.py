@@ -25,7 +25,7 @@ class ThreadedServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
 class Server(ThreadedServer):
     """ Wrapper to the threaded server instance """
-    def __init__(self, port=57890, lang_id=0, **kwargs):
+    def __init__(self, interpreter, **kwargs):
 
         # Get password
         try:
@@ -38,7 +38,7 @@ class Server(ThreadedServer):
 
         # Listen on any IP
         self.listening_address  = "0.0.0.0"
-        self.port     = int(port)
+        self.port = SERVER_PORT_NUMER # from utils library
         
         # Get IP address
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -75,7 +75,7 @@ class Server(ThreadedServer):
         # Create interface
 
         self.app = ServerApp(self, **kwargs)
-        self.app.set_interpreter(lang_id)
+        self.app.set_interpreter(interpreter)
         self.app.update_random_seed(seed=self.get_seed())
 
     def __str__(self):
@@ -214,6 +214,10 @@ class Server(ThreadedServer):
         """ Returns True if password is correct """
         return password == self.password.hexdigest()
 
+    def check_lang_id(self, lang_id):
+        """ Returns True if the lang_id matches that used by the server """
+        return int(lang_id) == self.app.lang.get_id()
+
 
 class RequestHandler(socketserver.BaseRequestHandler):
     """ Created whenever a new connection to the server is made:
@@ -222,6 +226,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
         self.client_address = (address, port)
     """
     master = None
+    error_message = ""
 
     @classmethod
     def set_master(cls, server):
@@ -242,10 +247,15 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             username = data[0]
             password = data[1]
+            lang_id  = data[2]
 
             if not self.master.authenticate(password):
 
-                raise LoginError("Failed login")
+                raise LoginError("Failed Login: Incorrect password.")
+
+            elif not self.master.check_lang_id(lang_id):
+
+                raise LoginError("Failed Login: Incorrect interpreter. Please use '{}' to connect to the server.".format(self.master.app.lang.get_name()))
 
         self.name    = username
         self.user_id = self.master.add_new_client(self.client_address, self.request, self.name)
@@ -260,6 +270,8 @@ class RequestHandler(socketserver.BaseRequestHandler):
             data = self.get_user_details()
 
         except ValueError:
+
+            # Just exit if the user disconnects during login
 
             return
 
