@@ -251,11 +251,11 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
             if not self.master.authenticate(password):
 
-                raise LoginError("Failed Login: Incorrect password.")
+                raise LoginError("Failed Login - Incorrect password.")
 
             elif not self.master.check_lang_id(lang_id):
 
-                raise LoginError("Failed Login: Incorrect interpreter. Please use '{}' to connect to the server.".format(self.master.app.lang.get_name()))
+                raise LoginError("Failed Login - Incorrect interpreter. Please use '{}' to connect to the server.".format(self.master.app.lang.get_name()))
 
         self.name    = username
         self.user_id = self.master.add_new_client(self.client_address, self.request, self.name)
