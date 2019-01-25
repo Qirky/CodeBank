@@ -423,18 +423,6 @@ LANGUAGE_NAMES = { FoxDot.get_name() : FoxDot.get_short_name(),
                    TidalCycles.get_name() : TidalCycles.get_short_name(),
                    TidalCyclesStack.get_name() : TidalCyclesStack.get_short_name() }
 
-# LANGUAGE_IDENT = { "foxdot" : "FoxDot",
-#                    "tidalcycles" : "TidalCycles",
-#                    "tidalcyclesstack" : "TidalCycles (Stack)" }
-
-# LANGUAGE_NAMES = { "FoxDot": 0, "TidalCycles": 1, "TidalCycles (Stack)": 2 }
-
-# LANGUAGE_ID_NUM = {  }
-
-# LANGUAGE_CLASS = { LANGUAGE_NAMES["FoxDot"] : FoxDot,
-#                    LANGUAGE_NAMES["TidalCycles"] : TidalCycles,
-#                    LANGUAGE_NAMES["TidalCycles (Stack)"] :TidalCyclesStack }
-
 def get_interpreter(name):
     return LANGUAGE_IDENT.get(name.lower(), None)
 

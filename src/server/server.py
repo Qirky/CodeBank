@@ -65,8 +65,6 @@ class Server(ThreadedServer):
 
         # Instantiate server process
 
-        RequestHandler.set_master(self)
-
         ThreadedServer.__init__(self, (self.listening_address, self.port), RequestHandler)
 
         self.server_thread = Thread(target=self.serve_forever)
@@ -228,10 +226,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
     master = None
     error_message = ""
 
-    @classmethod
-    def set_master(cls, server):
-        cls.master = server
-
     def get_user_details(self):
         # Get name and password
 
@@ -249,21 +243,23 @@ class RequestHandler(socketserver.BaseRequestHandler):
             password = data[1]
             lang_id  = data[2]
 
-            if not self.master.authenticate(password):
+            if not self.server.authenticate(password):
 
                 raise LoginError("Failed Login - Incorrect password.")
 
-            elif not self.master.check_lang_id(lang_id):
+            elif not self.server.check_lang_id(lang_id):
 
-                raise LoginError("Failed Login - Incorrect interpreter. Please use '{}' to connect to the server.".format(self.master.app.lang.get_name()))
+                raise LoginError("Failed Login - Incorrect interpreter. Please use '{}' to connect to the server.".format(self.server.app.lang.get_name()))
 
         self.name    = username
-        self.user_id = self.master.add_new_client(self.client_address, self.request, self.name)
+        self.user_id = self.server.add_new_client(self.client_address, self.request, self.name)
 
         return self.user_id, self.name
 
     def handle(self):
         """ Overload """
+
+        print(self.server, self.server, self.server is self.server)
 
         try:
 
@@ -299,7 +295,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
                 print("Client disconnected from {}".format(self.client_address))
 
-                self.master.remove_from_server(self.client_address)
+                self.server.remove_from_server(self.client_address)
 
                 break
 
@@ -312,7 +308,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Handle on the server side
 
-        self.master.add_to_queue(data)
+        self.server.add_to_queue(data)
 
         return
 
@@ -330,7 +326,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
         # Rest the seed
 
-        self.send( MESSAGE_SEED(seed=self.master.get_seed()) )
+        self.send( MESSAGE_SEED(seed=self.server.get_seed()) )
 
         # Grab current code
 
@@ -341,12 +337,12 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def pull_all_code(self):
         """ Sends all current codelet data to the client """
         # Get all the connected users
-        for id_num, user in list(self.master.users.items()):
+        for id_num, user in list(self.server.users.items()):
             if id_num != self.get_user_id():
                 self.send(MESSAGE_NAME(id_num, user.get_name()))
 
         # Get all the code
-        for codelet in self.master.app.get_codelets():
+        for codelet in self.server.app.get_codelets():
             data = MESSAGE_HISTORY(-1, codelet.get_id(), codelet.get_history(), codelet.get_order_id(), codelet.is_hidden())
             self.send(data)
 
@@ -354,13 +350,13 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def send(self, data):
         """ Sends the data to THIS connected client """
-        self.master.send_to_client(self.user_id, data)
+        self.server.send_to_client(self.user_id, data)
         return
 
     def send_to_all(self, data):
         """ Forwards 'data' to all connected clients """
 
-        for socket in self.master.connections():
+        for socket in self.server.connections():
 
             send_to_socket(socket, data)
 
