@@ -24,9 +24,8 @@ class Console(Tk.Text):
     def insert_user_update(self, user, text):
         self.enable()
         self.tag_config(user.tag(), foreground=user.get_colour())
-        self.insert(Tk.END, "User '", self.text_colour)
         self.insert(Tk.END, user.get_name(), user.tag())
-        self.insert(Tk.END, "' {}\n".format(text), self.text_colour)
+        self.insert(Tk.END, " {}\n".format(text), self.text_colour)
         self.see(Tk.END)
         self.disable()
         return

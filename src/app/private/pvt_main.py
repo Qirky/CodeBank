@@ -24,8 +24,7 @@ class Workspace(Tk.Frame):
                 CmdButton("RESET"         , self.parent.reset_program_state),
                 CmdButton("ROLLBACK"      , self.parent.trigger_rollback, default=Tk.DISABLED),
                 CmdButton("HIDE"          , self.parent.trigger_hide_codelet),
-                CmdButton("TOGGLE HIDDEN" , self.parent.toggle_view_hidden),
-                CmdButton("CLEAR CLOCK"   , self.parent.send_clear_clock_message),
+                CmdButton("TOGGLE HIDDEN" , self.parent.toggle_view_hidden)
             ]
         )
 
@@ -42,6 +41,8 @@ class Workspace(Tk.Frame):
         self.text.bind("<{}-minus>".format(CONTROL_KEY), self.parent.decrease_font_size)
 
         self.text.bind("<{}-k>".format(CONTROL_KEY), self.parent.show_clock_nudge_popup)
+
+        self.text.bind("<{}-greater>".format(CONTROL_KEY), self.parent.send_clear_clock_message)
 
         # Canvas bindings
 

@@ -27,7 +27,8 @@ class PeerBox(Tk.Frame):
 
         # Chat
 
-        self.chatbox = Tk.Text(self, bg="White", font=self.app.font, height=10, width=5, bd=1, relief=Tk.FLAT, wrap=Tk.WORD)
+        self.chatbox = Tk.Text(self, bg="White", font=self.app.font, height=10, width=5, bd=1, relief=Tk.FLAT, wrap=Tk.WORD,
+                               highlightthickness=4, highlightbackground="White")
         self.chatbox.grid(row=2, column=0, sticky=Tk.NSEW)
         self.chatbox.bind("<FocusIn>", lambda e: self.parent.focus())
         self.num_messages = 0

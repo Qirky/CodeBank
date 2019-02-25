@@ -21,11 +21,6 @@ class App(BasicApp):
 
             pass
 
-        # Menu bar
-
-        self.menu = MenuBar(self)
-        self.root.config(menu=self.menu)
-
         # Popup information
 
         self.popup_open = False
@@ -79,6 +74,11 @@ class App(BasicApp):
 
         self.solo_on = False
         self.selecting_codelet_to_hide = False
+
+        # Menu bar
+
+        self.menu = MenuBar(self)
+        self.root.config(menu=self.menu)
 
         # Don't allow users to use buttons / text box until connected
 
@@ -543,6 +543,22 @@ class App(BasicApp):
 
         return
 
+    def receive_chat_message(self, user_id, message):
+        """ Handler for getting a chat message, displays in the sharedspace chat widget """
+        
+        # Flash the border of the chat window
+        user = self.users[user_id]
+        chat = self.sharedspace.peer_box.chatbox
+        chat.config(highlightbackground=user.get_colour())
+
+        # Return to normal
+        self.root.after(150, lambda *e: chat.config(highlightbackground="White"))
+
+        # Insert message
+        BasicApp.receive_chat_message(self, user_id, message)
+        
+        return
+
     def start_monitoring_user(self, user):
         """ Called from public list box widget - flags a user as being monitored """
         self.workspace.console.insert_user_update(user, "is now being monitored")
@@ -617,7 +633,7 @@ class App(BasicApp):
     def clear_clock(self, user_id):
         """ Silently stops clock and prints message with user ID """
         BasicApp.clear_clock(self)
-        self.workspace.console.insert_user_update(self.socket.users[user_id], "has cleard the clock")
+        self.workspace.console.insert_user_update(self.socket.users[user_id], "has cleared the clock")
         return
 
     def add_user(self, user_id, name): # what is the point
