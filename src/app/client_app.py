@@ -198,7 +198,13 @@ class App(BasicApp):
 
     def send_monitored_code(self, string):
         """ Sends code to server to be forwarded to users monitoring this local user """
-        self.socket.send(MESSAGE_MONITOR_EVAL(self.get_user_id(), string))
+    
+        invalid = self.check_monitored_command(string)
+
+        if len(invalid) == 0:
+    
+            self.socket.send(MESSAGE_MONITOR_EVAL(self.get_user_id(), string))
+    
         return
 
     # Server communications
@@ -309,6 +315,16 @@ class App(BasicApp):
         banned = []
         for line in string.split("\n"):
             for phrase in self.lang.get_banned_commands():
+                match = phrase.match(line)
+                if match is not None:
+                    banned.append(match.group(1))
+        return banned
+
+    def check_monitored_command(self, string):
+        """ Returns True if the string contains code that can be shared via monitoring feature """
+        banned = []
+        for line in string.split("\n"):
+            for phrase in self.lang.get_unmonitored_commands():
                 match = phrase.match(line)
                 if match is not None:
                     banned.append(match.group(1))

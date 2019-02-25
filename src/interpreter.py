@@ -38,8 +38,11 @@ class Interpreter:
 
             raise FileNotFoundError(self.path)
 
-        self._banned_commands = []
+        self._banned_commands      = []
+        self._unmonitored_commands = []
+
         self._colour_map = {}
+        
         self.execute_setup_code()
 
     @classmethod
@@ -250,8 +253,15 @@ class Interpreter:
         """ Add a RegEx that will flag a code execution as disallowed when found """
         self._banned_commands.append(re.compile(regex))
 
+    def add_unmonitored_command(self, regex):
+        """ Add a RegEx that will flag a code execution as disallowed when found """
+        self._unmonitored_commands.append(re.compile(regex))
+
     def get_banned_commands(self):
         return self._banned_commands
+
+    def get_unmonitored_commands(self):
+        return self._unmonitored_commands
 
 class FoxDot(Interpreter):
     path = "{} -u -m FoxDot --pipe".format(PYTHON_EXECUTABLE)
@@ -265,6 +275,8 @@ class FoxDot(Interpreter):
         # Ban local changes to tempo / clock stopping
         self.add_banned_command(r".*(Clock\s*\.\s*bpm\s*[\+\-\*\/]*\s*=\s*.+)")
         self.add_banned_command(r".*(Clock\s*\.\s*clear\(\s*\))")
+
+        self.add_unmonitored_command(r".*(\.solo\(.*\))")
 
         # Set up syntax colouring
 
@@ -311,13 +323,13 @@ class FoxDot(Interpreter):
 
     def get_solo_code(self, string, on):
         players = self.get_streams(string)
-        if len(players):
-            if len(players) > 1:
-                cmd = "Group({}).solo({})".format(", ".join(players), int(on))
-            else:
-                cmd = "{}.solo({})".format(players[0], int(on))
+        if len(players) > 1:
+            cmd = "Group({}).solo({})".format(", ".join(players), int(on))
+        elif len(players) == 1:
+            cmd = "{}.solo({})".format(players[0], int(on))
         else:
-            return None
+            cmd = None
+        return cmd
 
     def get_reset_code(self, local_code, codelet_code):
         reset_code = []
