@@ -512,9 +512,19 @@ class App(BasicApp):
 
         else:
 
-            # Evaluate the code
+            # Evaluate the code as if done locally
+            
+            code = codelet.get_text()
 
-            self.evaluate_codelet(codelet)
+            if self.lang.contains_error(code):
+
+                codelet.flag_error()
+
+            else:
+
+                self.workspace.evaluate_code_locally(code)
+
+            self.sharedspace.redraw()
 
         return
 

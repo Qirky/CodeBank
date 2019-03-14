@@ -34,7 +34,7 @@ class Workspace(Tk.Frame):
 
         self.text = TextInput(self.container, main=self, font=self.font)
 
-        self.text.bind("<{}-Return>".format(CONTROL_KEY),       self.evaluate_code_locally)
+        self.text.bind("<{}-Return>".format(CONTROL_KEY),       self.evaluate_textbox)
         self.text.bind("<{}-Shift-Return>".format(CONTROL_KEY), self.push_code_to_remote)
 
         self.text.bind("<{}-equal>".format(CONTROL_KEY), self.parent.increase_font_size)
@@ -130,12 +130,20 @@ class Workspace(Tk.Frame):
 
     # Methods for running code
 
-    def evaluate_code_locally(self, event=None):
+    def evaluate_textbox(self, event=None):
         """ Runs code in the text box immediately without pushing to the remote """
 
         code = self.text.get_text()
 
         self.text.highlight()
+
+        self.evaluate_code_locally(code)
+
+        return "break"
+
+
+    def evaluate_code_locally(self, code):
+        """ Checks for banned code and runs code if valid """
 
         banned_code = self.parent.check_valid_command(code)
 
@@ -155,7 +163,7 @@ class Workspace(Tk.Frame):
             
                 print("\t{!r}".format(command))
 
-        return "break"
+        return
 
     def push_code_to_remote(self, event=None):
         """ Clears the text box and sends code to server """

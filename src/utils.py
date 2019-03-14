@@ -114,7 +114,7 @@ def MESSAGE_INFO(user_id, string):
     return [HANDLE_INFO, user_id, string]
 
 def MESSAGE_REMOVE(user_id):
-    """  """
+    """ Removes a user from the application """
     return [HANDLE_REMOVE, user_id]
 
 def MESSAGE_HISTORY(user_id, codelet_id, data, order_id, hidden=0):
