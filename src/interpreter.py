@@ -1,6 +1,6 @@
 from .utils import SYSTEM, WINDOWS, TIDAL_BOOT_FILE, PYTHON_EXECUTABLE
 import re, shlex, threading, tempfile, time, sys
-from subprocess import Popen
+from subprocess import Popen, TimeoutExpired
 from subprocess import PIPE, STDOUT
 
 CREATE_NO_WINDOW = 0x08000000 if SYSTEM == WINDOWS else 0
@@ -168,7 +168,11 @@ class Interpreter:
         """ Called to properly exit the subprocess and threads """
         self.is_alive = False
         if self.process.poll() is None:
-            self.process.communicate()
+            try:
+                self.process.communicate(timeout=3)
+            except TimeoutExpired:
+                self.process.kill()
+                self.process.communicate()
         if self.stdout_thread is not None:
             self.stdout_thread.join(1)
         return
